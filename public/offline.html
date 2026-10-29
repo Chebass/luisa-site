@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es-PE">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#f7f6f1" />
+    <title>Tu agenda sin conexión · Luisa</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        background: #f7f6f1;
+        color: #30382c;
+        font:
+          18px/1.6 "Segoe UI",
+          sans-serif;
+        margin: 0;
+        padding: 28px 22px;
+      }
+      main {
+        max-width: 650px;
+        margin: 30px auto;
+      }
+      header {
+        font:
+          32px Georgia,
+          serif;
+        color: #5b6548;
+      }
+      h1 {
+        font:
+          36px/1.2 Georgia,
+          serif;
+        margin: 32px 0 20px;
+      }
+      p {
+        color: #65705a;
+      }
+      button {
+        background: #5b6548;
+        color: #fff;
+        border: 0;
+        border-radius: 12px;
+        font:
+          18px "Segoe UI",
+          sans-serif;
+        padding: 15px 22px;
+        min-height: 50px;
+        margin: 20px 0;
+        cursor: pointer;
+      }
+      article {
+        background: #fffefa;
+        border: 1px solid #dce2d2;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 13px 0;
+      }
+      h2 {
+        font-size: 20px;
+        margin: 0 0 10px;
+        font-weight: 500;
+      }
+      article p {
+        margin: 5px 0;
+      }
+      .notice {
+        background: #eee9dc;
+        padding: 18px;
+        border-radius: 12px;
+        font-size: 17px;
+      }
+      .meta {
+        font-size: 15px;
+      }
+      #agenda {
+        margin-top: 25px;
+      }
+    </style>
+    <script src="/offline.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>luisa · bienestar</header>
+      <h1>Sin conexión, pero con calma</h1>
+      <p class="notice">
+        Esta es una copia de tu última agenda. Para guardar cambios, vuelve a
+        conectarte.
+      </p>
+      <p id="status" role="status">
+        Buscando la agenda guardada en este dispositivo…
+      </p>
+      <section id="agenda" aria-label="Última agenda guardada"></section>
+      <button id="reload">Volver a intentar la conexión</button>
+    </main>
+  </body>
+</html>
