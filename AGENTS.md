@@ -8,6 +8,7 @@
 - Clientes únicos por teléfono peruano normalizado; una reserva pública nunca cambia el nombre de un cliente existente ni devuelve sus datos.
 - GET nunca cambia datos. Cambios mediante POST autenticado o token seguro; cancelación explícita.
 - RLS en todas las tablas. Clave de servicio exclusivamente en servidor.
+- Acceso único de la dueña con correo y contraseña mediante Supabase Auth; sin Google ni registro público. Supabase administra los hashes y JWT. Sesiones persistentes con renovación y simultáneas por dispositivo; cerrar sesión siempre con scope local.
 - Motor puro en lib/availability.ts con pruebas de casos límite.
 - Demostración únicamente local, con datos ficticios. Nunca activar bypass de autenticación en producción.
 - Ejecutar lint, typecheck, pruebas y build antes de entregar cambios.

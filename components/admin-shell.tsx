@@ -19,6 +19,7 @@ import { useStore } from "./store-provider";
 import { browserSupabase } from "@/lib/supabase/browser";
 import { dayLabel } from "@/lib/dates";
 import { clearOfflineAgenda } from "@/lib/offline";
+import { signOutCurrentDevice } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { ModuleSkeleton, type ModuleName } from "./module-skeleton";
 const modules = new Set([
@@ -49,7 +50,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     const timer = setTimeout(() => setPending(null), 15000);
     return () => clearTimeout(timer);
   }, [pending]);
-  const { store, demo, online } = useStore();
+  const { store, demo, online, toast } = useStore();
   const unread = store.notifications.filter((n) => !n.read_at).length;
   return (
     <div
@@ -110,11 +111,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 className="icon-button"
                 title="Cerrar sesión"
                 onClick={async () => {
-                  await browserSupabase().auth.signOut();
-                  await clearOfflineAgenda();
-                  sessionStorage.removeItem("luisa-last-agenda");
-                  router.replace("/login");
-                  router.refresh();
+                  try {
+                    await signOutCurrentDevice(browserSupabase());
+                    await clearOfflineAgenda();
+                    sessionStorage.removeItem("luisa-last-agenda");
+                    router.replace("/login");
+                    router.refresh();
+                  } catch (error) {
+                    toast((error as Error).message);
+                  }
                 }}
               >
                 <LogOut size={18} />

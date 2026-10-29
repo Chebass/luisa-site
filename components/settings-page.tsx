@@ -23,6 +23,7 @@ import { dayLabel, timeLabel } from "@/lib/dates";
 import { browserSupabase } from "@/lib/supabase/browser";
 import { clearOfflineAgenda } from "@/lib/offline";
 import { useRouter } from "next/navigation";
+import { signOutCurrentDevice } from "@/lib/auth";
 import { TimePicker } from "./ui/time-picker";
 type InstallPrompt = Event & {
   prompt: () => Promise<void>;
@@ -460,10 +461,14 @@ export function SettingsPage() {
             <Button
               variant="ghost"
               onClick={async () => {
-                await browserSupabase().auth.signOut();
-                await clearOfflineAgenda();
-                router.replace("/login");
-                router.refresh();
+                try {
+                  await signOutCurrentDevice(browserSupabase());
+                  await clearOfflineAgenda();
+                  router.replace("/login");
+                  router.refresh();
+                } catch (error) {
+                  toast((error as Error).message);
+                }
               }}
             >
               <LogOut size={18} />

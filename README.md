@@ -33,17 +33,27 @@ La demostración se desactiva siempre con `NODE_ENV=production`, incluso si algu
    | Variable | Valor |
    | --- | --- |
    | `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública `anon` del proyecto |
-   | `SUPABASE_SERVICE_ROLE_KEY` | Clave secreta `service_role`, exclusivamente servidor |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Publishable key (`sb_publishable_…`) o clave pública heredada `anon` |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Secret key (`sb_secret_…`) o clave heredada `service_role`, exclusivamente servidor |
    | `OWNER_EMAIL` | El mismo correo registrado en `owner_access` |
    | `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` en local; origen HTTPS exacto en producción, sin barra final |
    | `NEXT_PUBLIC_DEMO_MODE` | `false` al conectar datos reales |
 
-4. En Supabase Authentication, activar Google. Crear las credenciales OAuth siguiendo [la guía de Supabase](https://supabase.com/docs/guides/auth/social-login/auth-google). Registrar en Google la URL de callback de **Supabase**, y en Supabase las URLs de redirección de la **aplicación**: `http://localhost:3000/auth/callback` y la correspondiente URL HTTPS de producción. Configurar también Site URL.
-5. Ingresar con Google usando el correo permitido. El servidor comprueba la identidad con `getUser()` antes de leer datos y en cada endpoint privado. Las políticas RLS también comprueban la lista de acceso. Las cuentas distintas no reciben datos.
+4. En **Supabase → Authentication**, habilitar el proveedor **Email** para correo y contraseña. Desactivar el registro de nuevos usuarios (**Allow new users to sign up**) y mantener Google deshabilitado. En **Authentication → Users**, crear manualmente la cuenta de la dueña con ese mismo correo y una contraseña; marcar el correo como confirmado al crearla. Esta cuenta de Auth es distinta de la fila `owner_access`: hacen falta ambas. No guardar la contraseña en `.env.local`, SQL ni Git. Supabase guarda el hash con bcrypt y emite los JWT y refresh tokens. No se necesita configurar Google, un secreto JWT propio ni una tabla de contraseñas. [Contraseñas de Supabase](https://supabase.com/docs/guides/auth/passwords), [almacenamiento de hashes](https://supabase.com/docs/guides/auth/password-security).
+5. Abrir `/login` e ingresar con el correo y contraseña de esa cuenta. El correo funciona como usuario de acceso. Después de autenticar, la app verifica la autorización en el servidor; una cuenta distinta se cierra únicamente en ese dispositivo y no entra al panel. El servidor también comprueba la identidad con `getUser()` en cada endpoint privado. Las políticas RLS conservan la lista de acceso.
 6. Revisar Ajustes: nombre, WhatsApp, duración, horarios, anticipación y mensajes.
 
 El correo de pruebas ya se dejó en el `.env.local` de esta máquina; no se versiona. Las claves y contraseñas no deben enviarse por el chat ni guardarse en Git. El número de pruebas se usa en los datos ficticios; reemplazarlo al activar la app real.
+
+### Sesión persistente en laptop y celular
+
+Iniciar sesión una vez en cada dispositivo. No hay cierre de sesión por tiempo de inactividad en la aplicación. Las cookies duran hasta 400 días y se renuevan al renovar los tokens, por lo que cerrar el navegador y volver a abrirlo no obliga a ingresar otra vez. El JWT conserva su vencimiento normal (por ejemplo, una hora); Supabase utiliza el refresh token para renovarlo sin pedir la contraseña.
+
+Supabase permite por defecto sesiones simultáneas sin límite de duración programado. Conservar **Single session per user** desactivado y no habilitar **Time-box user sessions** ni **Inactivity timeout**, si esas opciones aparecen en el plan. En Free se usa el comportamiento predeterminado; no hace falta contratar límites de sesión de pago. [Sesiones de Supabase](https://supabase.com/docs/guides/auth/sessions).
+
+**Cerrar sesión** afecta solo al dispositivo actual: se usa `signOut({ scope: 'local' })`, se eliminan sus cookies y su copia privada sin conexión. Las otras sesiones permanecen activas. Las pestañas del mismo navegador comparten sesión. Borrar datos del navegador, usar navegación privada, revocar la cuenta o cambiar la contraseña puede requerir volver a ingresar. No se promete persistencia si el navegador elimina el almacenamiento. [Cierre de sesión](https://supabase.com/docs/guides/auth/signout).
+
+Si se olvida la contraseña, administrarla desde Supabase Auth. La app no ofrece autorregistro ni envía correos automáticos de recuperación en este alcance.
 
 ## Reserva pública y protección
 
@@ -94,19 +104,21 @@ npm run build
 
 Pruebas de navegador: con `npm run dev` activo, ejecutar `npm run test:e2e`. Usa Chrome instalado en Windows; en otros sistemas, ejecutar antes `npx playwright install chromium`, o indicar `CHROME_PATH`. `TEST_BASE_URL` permite cambiar la URL. Incluye escritorio y tamaño iPhone; no sustituye probar Safari ni las notificaciones en un teléfono real. Las capturas y trazas locales quedan en `test-results/`, fuera de Git.
 
+Las pruebas de agenda de navegador requieren un servidor en modo demostración, sin conexión real. Con Supabase ya conectado, usar `npm run test:auth` para revisar el formulario de contraseña, visibilidad, errores y progreso en escritorio y móvil. Sus respuestas de Auth están interceptadas: no prueban contraseñas contra una cuenta real. Las pruebas unitarias de Auth usan el SDK real y un proveedor HTTP simulado para verificar cookies persistentes, renovación, bloqueo de cuentas no autorizadas y cierre independiente de dos dispositivos; tampoco realizan solicitudes externas. La comprobación final con la cuenta real se hace manualmente después de crearla.
+
 Pruebas SQL: `npm run test:db` requiere binarios de PostgreSQL. Usa por defecto PostgreSQL 18 en Windows; en otros sistemas configurar `POSTGRES_BIN` con el directorio de `initdb`, `postgres`, `pg_ctl` y `psql`. Crea un clúster temporal aislado en el puerto 55439 y lo detiene al terminar. No utiliza credenciales de producción. Valida concurrencia, exclusión de horarios, teléfonos únicos, nombre inmutable desde reservas públicas, permisos, RLS, tokens, idempotencia, bloqueos y auditoría. La carpeta temporal se indica en la salida para su revisión.
 
 Prueba del modo producción sin credenciales: después de compilar, ejecutar `npm start -- --port 3001` y, en otra terminal, `npm run test:production`. Comprueba que no existe acceso a la demo, que el panel exige conexión/autenticación y que los enlaces públicos usan POST únicamente cuando corresponde. Las respuestas HTTP de tokens se simulan en el navegador; la prueba SQL verifica las transacciones reales. `PRODUCTION_TEST_URL` permite cambiar el origen del servidor de prueba.
 
 ## Publicación y costo
 
-No se ha publicado ni conectado una cuenta real de Supabase. Faltan las credenciales, Google OAuth, Turnstile, VAPID y elegir el alojamiento. Configurar las variables de producción y aplicar las migraciones antes de aceptar reservas reales.
+El despliegue y las pruebas con cuentas reales dependen de completar las credenciales de Supabase, crear la cuenta de Auth con contraseña, configurar Turnstile y VAPID y elegir el alojamiento. Configurar las variables de producción y aplicar las migraciones antes de aceptar reservas reales.
 
 **La propuesta original de usar Vercel Hobby para un negocio requiere cambiarse:** [Vercel limita Hobby a uso personal y no comercial](https://vercel.com/docs/plans/hobby). Este proyecto no promete un despliegue comercial gratuito en ese plan. Puede compilarse como Next.js estándar (`npm run build` / `npm start`); el proveedor compatible con uso comercial y costo cero debe validarse antes del despliegue. No se ha contratado ningún plan de pago.
 
 [Supabase Free puede pausar proyectos con poca actividad durante siete días](https://supabase.com/docs/guides/platform/free-project-pausing). Reanudar desde su panel si ocurre; no se promete disponibilidad permanente ni restauración a un punto en el tiempo. Usar la exportación CSV como respaldo mensual.
 
-Antes del lanzamiento queda verificar de extremo a extremo con las cuentas reales: Google OAuth y restricción de correo, Turnstile y redirecciones de WhatsApp en su navegador interno, Realtime, Web Push y la instalación en los celulares de la dueña. También falta la prueba de uso con ella para ajustar legibilidad y vocabulario.
+Antes del lanzamiento queda verificar de extremo a extremo con la cuenta real: acceso con contraseña y restricción de correo, persistencia y renovación en laptop y celular, cierre independiente por dispositivo, Turnstile y redirecciones de WhatsApp en su navegador interno, Realtime, Web Push y la instalación en los celulares de la dueña. También falta la prueba de uso con ella para ajustar legibilidad y vocabulario.
 
 ## Estructura
 

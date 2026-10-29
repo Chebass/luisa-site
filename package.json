@@ -10,6 +10,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run lib",
     "test:e2e": "playwright test",
+    "test:auth": "playwright test e2e/password-auth.spec.ts",
     "test:db": "node scripts/test-database.mjs",
     "test:production": "node scripts/smoke-production.mjs",
     "format": "prettier --write app components lib e2e scripts *.ts *.mjs *.json"

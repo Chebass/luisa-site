@@ -4,6 +4,35 @@
 html {
   scrollbar-gutter: stable;
 }
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-field input {
+  padding-right: 57px;
+}
+.password-field .password-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c7f55;
+}
+.password-field .password-toggle:active {
+  transform: translateY(-50%) scale(0.97);
+}
+.password-login-form {
+  width: 100%;
+  margin-top: 5px;
+}
+.password-login-form .login-session-help {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.password-login-form input {
+  font-size: 18px;
+}
 * {
   scrollbar-width: thin;
   scrollbar-color: #a8b193 #efefe6;

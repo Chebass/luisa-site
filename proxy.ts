@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { authCookieOptions } from "@/lib/supabase/cookie-options";
 export async function proxy(req: NextRequest) {
   let response = NextResponse.next({ request: req });
   if (
@@ -11,6 +12,7 @@ export async function proxy(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
+      cookieOptions: authCookieOptions,
       cookies: {
         getAll: () => req.cookies.getAll(),
         setAll(values) {
@@ -24,10 +26,13 @@ export async function proxy(req: NextRequest) {
     },
   );
   await db.auth.getUser();
+  response.headers.set("Cache-Control", "private, no-store");
   return response;
 }
 export const config = {
   matcher: [
+    "/login",
+    "/api/auth/session",
     "/inicio/:path*",
     "/calendario/:path*",
     "/clientes/:path*",
