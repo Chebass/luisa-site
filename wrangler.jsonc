@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "luisa-bienestar",
+  "name": "luisa-site",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-10-29",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -16,7 +16,7 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "luisa-bienestar",
+      "service": "luisa-site",
     },
   ],
 }
