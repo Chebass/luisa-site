@@ -7,6 +7,7 @@ import { Brand } from "./brand";
 import { Button } from "./ui/button";
 import { browserSupabase } from "@/lib/supabase/browser";
 import { signInOwner } from "@/lib/auth";
+import { AppSkeleton } from "./app-skeleton";
 export function LoginPage({
   configured,
   demo,
@@ -17,6 +18,7 @@ export function LoginPage({
   error: boolean;
 }) {
   const [busy, setBusy] = useState(false);
+  const [entering, setEntering] = useState(false);
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +30,7 @@ export function LoginPage({
   );
   async function login(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (busy) return;
     setBusy(true);
     setMessage("");
     try {
@@ -39,19 +42,21 @@ export function LoginPage({
         if (!response.ok) throw new Error("Access check failed");
         return true;
       });
+      setEntering(true);
       setPassword("");
       router.replace("/inicio");
       router.refresh();
     } catch (error) {
+      setEntering(false);
+      setBusy(false);
       setMessage(
         error instanceof Error
           ? error.message
           : "No pudimos ingresar. Inténtalo de nuevo.",
       );
-    } finally {
-      setBusy(false);
     }
   }
+  if (entering) return <AppSkeleton />;
   return (
     <main className="login-page" id="main-content">
       <div className="login-art">

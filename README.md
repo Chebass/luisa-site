@@ -85,6 +85,42 @@ Los iconos, el manifiesto y el service worker están incluidos. Para regenerar l
 
 Generar claves VAPID una sola vez con `npx web-push generate-vapid-keys` y guardarlas en `NEXT_PUBLIC_VAPID_PUBLIC_KEY` y `VAPID_PRIVATE_KEY`. Configurar `VAPID_SUBJECT` como un `mailto:` válido. En Ajustes, tocar **Activar avisos** en cada dispositivo. La aplicación no pide permiso al abrir. Las suscripciones vencidas se eliminan al enviar.
 
+### Configuración paso a paso
+
+1. **Avisos dentro de la app (Realtime):** la migración ya añade `public.notifications` a la publicación `supabase_realtime`. En el editor SQL de Supabase, comprobarlo con esta consulta; debe devolver una fila:
+
+   ```sql
+   select schemaname, tablename
+   from pg_publication_tables
+   where pubname = 'supabase_realtime'
+     and schemaname = 'public'
+     and tablename = 'notifications';
+   ```
+
+   Si no devuelve filas, ejecutar solo `alter publication supabase_realtime add table public.notifications;`. El correo de `owner_access` debe coincidir con la cuenta que inició sesión y con `OWNER_EMAIL`. Conservar RLS activo y la política de lectura de la dueña; no hacen falta permisos de lectura públicos. [Postgres Changes y RLS](https://supabase.com/docs/guides/realtime/postgres-changes).
+
+2. **Generar las claves de Web Push en la terminal local:**
+
+   ```powershell
+   npx web-push generate-vapid-keys
+   ```
+
+   Copiar `Public Key` y `Private Key` a `.env.local` y completar el contacto:
+
+   ```env
+   NEXT_PUBLIC_VAPID_PUBLIC_KEY=PUBLIC_KEY_GENERADA
+   VAPID_PRIVATE_KEY=PRIVATE_KEY_GENERADA
+   VAPID_SUBJECT=mailto:TU_CORREO_DE_CONTACTO
+   ```
+
+   Conservar ese mismo par: no generarlo de nuevo en cada reinicio o despliegue. La clave privada va solo en las variables del servidor, nunca en Git ni en el chat. Las claves VAPID son distintas de las claves de Supabase. [Web Push: claves VAPID](https://github.com/web-push-libs/web-push).
+
+3. **Reiniciar y permitir:** reiniciar `npm run dev`, volver a cargar la app, iniciar sesión y abrir **Más → Ajustes → Activar avisos**. Aceptar el permiso del navegador. Repetir en laptop y celular; cada navegador y origen conserva su propia suscripción. En Supabase, `public.push_subscriptions` guardará cada endpoint y sus claves. Si el navegador bloqueó el permiso previamente, cambiarlo desde los permisos del sitio y volver a activar los avisos.
+
+4. **Prueba local y móvil:** en la laptop se puede probar desde `http://localhost:3000` (o el puerto configurado), que es un contexto confiable. Para Web Push en el celular hace falta abrir la app desde su URL HTTPS, no desde una IP local por HTTP. En iPhone con iOS 16.4 o posterior, añadirla a la pantalla de inicio desde Safari, abrirla desde su icono y entonces tocar **Activar avisos**. En Android, abrir la URL HTTPS en Chrome, instalar la app y habilitar los avisos. Permitir también las notificaciones del navegador/app en el sistema operativo. [Contextos seguros](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts), [Web Push en iPhone](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/).
+
+5. **Comprobar de extremo a extremo:** con el servidor activo, guardar una cita de prueba desde el panel. Verificar la campana y la lista de notificaciones. Después minimizar la app y guardar otra cita desde un segundo dispositivo o ventana; comprobar el aviso del sistema. Las rutas de la app envían Push al crear citas o procesar acciones del cliente; una inserción hecha solo desde el editor SQL prueba Realtime, pero no ejecuta ese envío Push. En local, mantener `npm run dev` activo; en producción, el servidor HTTPS debe estar disponible. La entrega también depende de los permisos y la conectividad del dispositivo.
+
 Web Push e instalación requieren HTTPS en producción. En iPhone, instalar primero desde Safari con Compartir → Agregar a pantalla de inicio; verificar con un iPhone real. Consultar [la documentación de WebKit](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/).
 
 Mientras la agenda está abierta, puede seguir consultándose si se pierde la conexión; se bloquean los cambios. Después de recargar sin conexión, se ofrece una copia básica de los próximos 14 días guardada en el dispositivo hasta 12 horas: nombres, horas y estados, sin teléfonos, notas ni tokens. Se cifra con Web Crypto en IndexedDB y se elimina al cerrar sesión. Como toda copia local, requiere un dispositivo personal y no puede enterarse de una revocación remota mientras esté desconectado. El service worker solo almacena la pantalla genérica sin conexión; no guarda respuestas autenticadas ni fichas en la caché de recursos. Las páginas públicas y enlaces de acción no usan esa copia. La demostración no guarda esta copia privada.
@@ -112,7 +148,40 @@ Prueba del modo producción sin credenciales: después de compilar, ejecutar `np
 
 ## Publicación y costo
 
-El despliegue y las pruebas con cuentas reales dependen de completar las credenciales de Supabase, crear la cuenta de Auth con contraseña, configurar Turnstile y VAPID y elegir el alojamiento. Configurar las variables de producción y aplicar las migraciones antes de aceptar reservas reales.
+### Desplegar en Cloudflare Workers
+
+La app está preparada para **Workers con OpenNext**. Conserva Next.js, Supabase, el acceso con contraseña y Web Push. No necesita mover datos a D1 ni crear otro proyecto de Supabase. `wrangler.jsonc` y `open-next.config.ts` definen el Worker y los recursos estáticos. No se necesita R2 para las páginas dinámicas de esta aplicación. [Adaptador OpenNext](https://developers.cloudflare.com/workers/framework-guides/web-apps/opennext/).
+
+1. En Cloudflare, abrir **Workers & Pages → Create application → conectar GitHub**, seleccionar `Chebass/luisa-site`, rama `main`, raíz del repositorio, nombre **`luisa-bienestar`** (debe coincidir con `wrangler.jsonc`). Elegir Workers con la configuración OpenNext del repositorio; conservar Next.js y evitar una migración automática a otro framework. No publicar como sitio estático.
+2. Elegir la URL estable del Worker: `https://luisa-bienestar.TU_SUBDOMINIO.workers.dev`, o un dominio propio. Usar el hostname exacto mostrado por Cloudflare; `TU_SUBDOMINIO` es un ejemplo. No hace falta comprar un dominio para probar.
+3. En **Turnstile → Add widget**, crear el widget `Luisa reservas`, modo **Managed**, y añadir ese hostname sin `https://` ni `/reservar`. Copiar **Site key** y **Secret key**. Para probar en local, preferir otro widget con `localhost` permitido. Las claves de prueba de Cloudflare nunca deben usarse en producción. [Hostnames de Turnstile](https://developers.cloudflare.com/turnstile/additional-configuration/hostname-management/).
+4. Configurar las variables de la siguiente tabla tanto en **Settings → Build → Build variables and secrets** como en **Settings → Variables and Secrets** del Worker. Las primeras permiten compilar; las segundas permiten ejecutar la app. Los nombres de menú pueden variar. No subir `.env.local`. [Variables en OpenNext](https://opennext.js.org/cloudflare/howtos/env-vars).
+
+   | Variable | Valor en Cloudflare |
+   | --- | --- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | Mismo proyecto que en local |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Misma clave pública |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Misma clave privada, tipo **Secret** |
+   | `OWNER_EMAIL` | Mismo correo autorizado |
+   | `NEXT_PUBLIC_APP_URL` | URL HTTPS estable, sin barra final ni rutas |
+   | `NEXT_PUBLIC_DEMO_MODE` | `false` |
+   | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Site key del widget real |
+   | `TURNSTILE_SECRET_KEY` | Secret key, tipo **Secret** |
+   | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Clave pública generada anteriormente |
+   | `VAPID_PRIVATE_KEY` | Misma clave privada VAPID, tipo **Secret** |
+   | `VAPID_SUBJECT` | `mailto:` con el correo de contacto |
+   | `NODE_VERSION` | `24`, solo en variables de build |
+
+   Las tres VAPID pueden quedar pendientes si primero se quiere comprobar la reserva; sin ellas no hay Push, pero sí reservas y avisos dentro del panel. Si se configura una clave VAPID, completar las tres. No añadir prefijos `NEXT_PUBLIC_` a secretos.
+
+5. Configurar **Build command**: `npm run check:config -- --production && npm run build:cloudflare`; **Deploy command**: `npm run deploy:cloudflare`. La instalación usa `npm ci`. El despliegue conserva las variables del panel (`keep_vars`). La comprobación falla con nombres de variables pendientes, URL local o claves Turnstile de prueba; nunca imprime los valores. Reintentar el build después de completar la configuración. Una compilación exitosa no sustituye probar las integraciones reales.
+6. En Supabase, **Authentication → URL Configuration → Site URL**, poner el origen HTTPS estable. Mantener Email habilitado, registro público y Google deshabilitados. Esta app no usa OAuth ni necesita `/auth/callback`. No volver a ejecutar la migración ni el seed sobre los datos existentes.
+7. Abrir la URL HTTPS `/reservar` sin iniciar sesión: elegir un horario futuro, completar datos, pasar Turnstile y guardar. Comprobar que aparece en el panel y que WhatsApp abre el mensaje con enlaces HTTPS al mismo origen. Verificar cancelar y cambiar con los enlaces de esa cita. La reserva se guarda antes de abrir WhatsApp; enviar el mensaje requiere la acción del cliente. Realizar esta comprobación con datos de prueba, sin compartir todavía el enlace con clientes.
+8. Entrar a `/login` en laptop y celular, instalar la PWA y activar avisos en ambos. Las suscripciones de `localhost` no sustituyen las de la URL publicada. Las claves VAPID deben mantenerse al redesplegar. Un cambio de hostname exige actualizar `NEXT_PUBLIC_APP_URL`, el widget Turnstile y volver a compilar.
+
+En local se mantiene `npm run dev` y `.env.local` con el origen local. `npm run check:config` informa qué falta sin tocar la base de datos. `npm run build:cloudflare` comprueba el empaquetado para Workers; `npm run preview:cloudflare` permite probarlo localmente después de compilar. Windows puede tener limitaciones con OpenNext; el build de Cloudflare usa Linux. No ejecutar `deploy:cloudflare` antes de compilar con las variables del destino.
+
+**Costo:** Workers Free permite probar con límites de 10 ms de CPU por petición y tamaño comprimido de 3 MiB; no garantizamos que alcance para SSR y Push. Workers Paid parte de **US$5/mes**, con consumos adicionales según uso y tamaño máximo de 10 MiB. No se activa un plan de pago automáticamente. [Precios de Workers](https://developers.cloudflare.com/workers/platform/pricing/), [límites](https://developers.cloudflare.com/workers/platform/limits/).
 
 **La propuesta original de usar Vercel Hobby para un negocio requiere cambiarse:** [Vercel limita Hobby a uso personal y no comercial](https://vercel.com/docs/plans/hobby). Este proyecto no promete un despliegue comercial gratuito en ese plan. Puede compilarse como Next.js estándar (`npm run build` / `npm start`); el proveedor compatible con uso comercial y costo cero debe validarse antes del despliegue. No se ha contratado ningún plan de pago.
 

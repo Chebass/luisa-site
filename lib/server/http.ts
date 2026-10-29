@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { serviceSupabase } from "@/lib/supabase/server";
+import { requestClientIp } from "@/lib/client-ip";
 export function errorResponse(error: unknown) {
   const e = error as { message?: string; code?: string };
   if (error instanceof ZodError)
@@ -99,8 +100,7 @@ export async function rateLimit(
   limit = 20,
   seconds = 600,
 ) {
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = requestClientIp(req.headers, process.env.DEPLOYMENT_PLATFORM);
   const key = createHash("sha256").update(`${scope}:${ip}`).digest("hex");
   const { data, error } = await serviceSupabase().rpc("consume_rate_limit", {
     p_key: key,

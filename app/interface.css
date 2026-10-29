@@ -4,6 +4,100 @@
 html {
   scrollbar-gutter: stable;
 }
+.app-loading-shell {
+  animation: zen-content-in 0.2s ease-out both;
+}
+.skeleton-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  color: #596748;
+}
+.skeleton-brand > span {
+  font:
+    39px/1 Georgia,
+    serif;
+  letter-spacing: -1.8px;
+}
+.skeleton-brand small {
+  display: block;
+  font:
+    8px/1.6 "Segoe UI",
+    sans-serif;
+  letter-spacing: 2px;
+  margin-top: 8px;
+}
+.skeleton-sidebar-nav {
+  display: grid;
+  gap: 10px;
+  margin-top: 70px;
+}
+.sk-sidebar-link {
+  height: 54px;
+  border-radius: 11px;
+}
+.skeleton-sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: auto;
+  padding: 15px 10px;
+}
+.sk-profile-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+}
+.sk-profile-name {
+  height: 16px;
+  min-height: 16px;
+  width: 105px;
+}
+.sk-header-date {
+  height: 15px;
+  min-height: 15px;
+  width: 145px;
+}
+.app-skeleton-mobile-nav {
+  display: none;
+}
+@media (max-width: 760px) {
+  .sk-header-date {
+    display: none;
+  }
+  .app-skeleton-mobile-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 10px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid #e2e6d6;
+    background: #fffefa;
+  }
+  .app-skeleton-mobile-nav > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 65px;
+  }
+  .sk-nav-icon {
+    width: 23px;
+    height: 23px;
+    min-height: 23px;
+    border-radius: 7px;
+  }
+  .sk-nav-label {
+    width: 41px;
+    height: 9px;
+    min-height: 9px;
+  }
+}
 .password-field {
   position: relative;
   display: flex;

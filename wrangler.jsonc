@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "luisa-bienestar",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-29",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "workers_dev": true,
+  "keep_vars": true,
+  "vars": {
+    "DEPLOYMENT_PLATFORM": "cloudflare",
+  },
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "luisa-bienestar",
+    },
+  ],
+}

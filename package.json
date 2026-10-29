@@ -5,10 +5,14 @@
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
+    "check:config": "node scripts/check-config.mjs",
+    "build:cloudflare": "opennextjs-cloudflare build",
+    "deploy:cloudflare": "npm run check:config -- --production && opennextjs-cloudflare deploy -- --keep-vars",
+    "preview:cloudflare": "opennextjs-cloudflare preview",
     "start": "next start --hostname 0.0.0.0",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run lib",
+    "test": "vitest run lib && node --test scripts/check-config.test.mjs",
     "test:e2e": "playwright test",
     "test:auth": "playwright test e2e/password-auth.spec.ts",
     "test:db": "node scripts/test-database.mjs",
@@ -35,7 +39,13 @@
     "web-push": "^3.6.7",
     "zod": "^4.1.0"
   },
+  "overrides": {
+    "@node-minify/core": {
+      "glob": "^10.5.0"
+    }
+  },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.14",
     "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4.1.0",
     "@types/node": "^24.0.0",
@@ -47,6 +57,7 @@
     "prettier": "^3.9.10",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.9.0",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "wrangler": "^4.156.0"
   }
 }
