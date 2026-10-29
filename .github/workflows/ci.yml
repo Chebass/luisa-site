@@ -1,0 +1,28 @@
+name: Validate Linux build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      # Match the installer used by Cloudflare, including its strict lock validation.
+      - run: npm install --global npm@10.9.2
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      # No deployment or production credentials are needed for this build check.
+      - run: npm run build:cloudflare

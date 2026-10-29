@@ -138,6 +138,8 @@ npm test
 npm run build
 ```
 
+GitHub Actions repite la instalación limpia con `npm ci` y npm 10.9.2 en Linux, junto con lint, TypeScript, pruebas y el build de Workers. Esto detecta dependencias opcionales de otras plataformas que pueden faltar si el archivo de bloqueo se actualiza solo sobre un `node_modules` existente de Windows. Ante un error `Missing: … from lock file`, reparar el lock en una carpeta sin `node_modules` y verificar `npm ci`; no sustituir la instalación reproducible del despliegue por `npm install`.
+
 Pruebas de navegador: con `npm run dev` activo, ejecutar `npm run test:e2e`. Usa Chrome instalado en Windows; en otros sistemas, ejecutar antes `npx playwright install chromium`, o indicar `CHROME_PATH`. `TEST_BASE_URL` permite cambiar la URL. Incluye escritorio y tamaño iPhone; no sustituye probar Safari ni las notificaciones en un teléfono real. Las capturas y trazas locales quedan en `test-results/`, fuera de Git.
 
 Las pruebas de agenda de navegador requieren un servidor en modo demostración, sin conexión real. Con Supabase ya conectado, usar `npm run test:auth` para revisar el formulario de contraseña, visibilidad, errores y progreso en escritorio y móvil. Sus respuestas de Auth están interceptadas: no prueban contraseñas contra una cuenta real. Las pruebas unitarias de Auth usan el SDK real y un proveedor HTTP simulado para verificar cookies persistentes, renovación, bloqueo de cuentas no autorizadas y cierre independiente de dos dispositivos; tampoco realizan solicitudes externas. La comprobación final con la cuenta real se hace manualmente después de crearla.
