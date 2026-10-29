@@ -1,4 +1,5 @@
 "use client";
+import { ModalPresence } from "./modal-presence";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -248,12 +249,16 @@ export function HomePage() {
           </div>
         </aside>
       </div>
-      {newAppointment && (
-        <AppointmentForm onClose={() => setNewAppointment(false)} />
-      )}{" "}
-      {detail && (
-        <AppointmentDetail id={detail} onClose={() => setDetail(null)} />
-      )}
+      <ModalPresence>
+        {newAppointment && (
+          <AppointmentForm onClose={() => setNewAppointment(false)} />
+        )}
+      </ModalPresence>{" "}
+      <ModalPresence>
+        {detail && (
+          <AppointmentDetail id={detail} onClose={() => setDetail(null)} />
+        )}
+      </ModalPresence>
     </>
   );
 }

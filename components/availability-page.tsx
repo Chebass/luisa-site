@@ -1,4 +1,5 @@
 "use client";
+import { ModalPresence } from "./modal-presence";
 import { useState, useEffect, useRef } from "react";
 import {
   Plus,
@@ -15,6 +16,9 @@ import { Button } from "./ui/button";
 import { Modal } from "./modal";
 import { dateKey, dayLabel, localInstant, timeLabel } from "@/lib/dates";
 import { formatInTimeZone } from "date-fns-tz";
+import { DatePicker } from "./ui/date-picker";
+import { TimePicker } from "./ui/time-picker";
+import { Select } from "./ui/select";
 const weekdays = [
   "Domingo",
   "Lunes",
@@ -289,139 +293,130 @@ export function AvailabilityPage({
           Ir al calendario <ArrowUpRight size={16} />
         </Link>
       </p>
-      {kind && (
-        <Modal
-          title={
-            kind === "rule"
-              ? "Un horario que se repite"
-              : "Reservar un momento para ti"
-          }
-          onClose={() => setKind(null)}
-        >
-          <form onSubmit={submit} className="stack-form">
-            {kind === "rule" ? (
-              <label>
-                Día de la semana
-                <select
-                  value={weekday}
-                  onChange={(e) => setWeekday(Number(e.target.value))}
-                >
-                  {weekdays.map((d, i) => (
-                    <option value={i} key={d}>
-                      {d}
-                    </option>
-                  ))}
-                </select>
+      <ModalPresence>
+        {kind && (
+          <Modal
+            title={
+              kind === "rule"
+                ? "Un horario que se repite"
+                : "Reservar un momento para ti"
+            }
+            onClose={() => setKind(null)}
+          >
+            <form onSubmit={submit} className="stack-form">
+              {kind === "rule" ? (
+                <label>
+                  Día de la semana
+                  <Select
+                    label="Día de la semana"
+                    value={String(weekday)}
+                    onValueChange={(value) => setWeekday(Number(value))}
+                    options={weekdays.map((label, i) => ({
+                      label,
+                      value: String(i),
+                    }))}
+                  />
+                </label>
+              ) : (
+                <div className="form-row">
+                  <label>
+                    Desde el día
+                    <DatePicker
+                      label="Desde el día"
+                      value={day}
+                      min={dateKey()}
+                      onChange={(value) => {
+                        setDay(value);
+                        if (endDay < value) setEndDay(value);
+                      }}
+                      required
+                    />
+                  </label>
+                  <label>
+                    Hasta el día
+                    <DatePicker
+                      label="Hasta el día"
+                      value={endDay}
+                      min={day}
+                      onChange={setEndDay}
+                      required
+                    />
+                  </label>
+                </div>
+              )}
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={allDay}
+                  onChange={(e) => setAllDay(e.target.checked)}
+                />
+                Bloquear todo el día
               </label>
-            ) : (
-              <div className="form-row">
-                <label>
-                  Desde el día
-                  <input
-                    type="date"
-                    value={day}
-                    min={dateKey()}
-                    onChange={(e) => {
-                      setDay(e.target.value);
-                      if (endDay < e.target.value) setEndDay(e.target.value);
-                    }}
-                    required
-                  />
-                </label>
-                <label>
-                  Hasta el día
-                  <input
-                    type="date"
-                    value={endDay}
-                    min={day}
-                    onChange={(e) => setEndDay(e.target.value)}
-                    required
-                  />
-                </label>
-              </div>
-            )}
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={allDay}
-                onChange={(e) => setAllDay(e.target.checked)}
-              />
-              Bloquear todo el día
-            </label>
-            {!allDay && (
-              <div className="form-row">
-                <label>
-                  Desde las
-                  <input
-                    type="time"
-                    required
+              {!allDay && (
+                <div className="form-row">
+                  <TimePicker
+                    label="Desde las"
                     value={start}
-                    onChange={(e) => setStart(e.target.value)}
+                    onChange={setStart}
                   />
-                </label>
-                <label>
-                  Hasta las
-                  <input
-                    type="time"
-                    required
-                    value={end}
-                    onChange={(e) => setEnd(e.target.value)}
-                  />
-                </label>
-              </div>
-            )}
-            <label>
-              ¿Cómo lo llamamos?
-              <input
-                required
-                maxLength={120}
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                placeholder="Por ejemplo: trabajo, familia o descanso"
-              />
-            </label>
-            {error && (
-              <p className="form-error" role="alert">
-                {error}
-              </p>
-            )}
-            <Button disabled={busy}>
-              {busy ? "Guardando…" : "Guardar mi pausa"}
-            </Button>
-          </form>
-        </Modal>
-      )}
-      {remove && (
-        <Modal title="¿Liberar este horario?" onClose={() => setRemove(null)}>
-          <p>
-            Los clientes podrán reservar en este espacio si no hay otra cita o
-            bloqueo.
-          </p>
-          <div className="dialog-actions">
-            <Button
-              disabled={busy}
-              onClick={async () => {
-                try {
-                  await mutate({
-                    kind: remove.kind,
-                    value: { id: remove.id },
-                    remove: true,
-                  });
-                  setRemove(null);
-                  toast("Horario liberado.");
-                } catch (e) {
-                  toast((e as Error).message);
-                }
-              }}
-            >
-              Sí, liberar horario
-            </Button>
-            <Button variant="outline" onClick={() => setRemove(null)}>
-              Mantener bloqueo
-            </Button>
-          </div>
-        </Modal>
-      )}
+                  <TimePicker label="Hasta las" value={end} onChange={setEnd} />
+                </div>
+              )}
+              <label>
+                ¿Cómo lo llamamos?
+                <input
+                  required
+                  maxLength={120}
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                  placeholder="Por ejemplo: trabajo, familia o descanso"
+                />
+              </label>
+              {error && (
+                <p className="form-error" role="alert">
+                  {error}
+                </p>
+              )}
+              <Button loading={busy} disabled={busy}>
+                {busy ? "Guardando…" : "Guardar mi pausa"}
+              </Button>
+            </form>
+          </Modal>
+        )}
+      </ModalPresence>
+      <ModalPresence>
+        {remove && (
+          <Modal title="¿Liberar este horario?" onClose={() => setRemove(null)}>
+            <p>
+              Los clientes podrán reservar en este espacio si no hay otra cita o
+              bloqueo.
+            </p>
+            <div className="dialog-actions">
+              <Button
+                disabled={busy}
+                onClick={async () => {
+                  try {
+                    await mutate({
+                      kind: remove.kind,
+                      value: { id: remove.id },
+                      remove: true,
+                    });
+                    setRemove(null);
+                    toast("Horario liberado.");
+                  } catch (e) {
+                    toast((e as Error).message);
+                  }
+                }}
+              >
+                Sí, liberar horario
+              </Button>
+              <Button variant="outline" onClick={() => setRemove(null)}>
+                Mantener bloqueo
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </ModalPresence>
     </>
   );
 }

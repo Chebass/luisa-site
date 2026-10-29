@@ -1,6 +1,6 @@
 # Luisa · bienestar
 
-Aplicación de citas para masajes a domicilio. Next.js App Router, TypeScript, Tailwind, componentes compatibles con shadcn/ui y Supabase. Interfaz en español de Perú, pensada para una sola administradora y clientes sin cuenta.
+Aplicación de citas para masajes en casa de la dueña del negocio. Next.js App Router, TypeScript, Tailwind, componentes compatibles con shadcn/ui y Supabase. Interfaz en español de Perú, pensada para una sola administradora y clientes sin cuenta.
 
 ## Empezar en local
 
@@ -82,6 +82,8 @@ Mientras la agenda está abierta, puede seguir consultándose si se pierde la co
 Para marcar citas pasadas como atendidas, activar `pg_cron` en Supabase y ejecutar `supabase/maintenance.sql`. Corre cada 30 minutos y registra eventos, sin sobrescribir canceladas ni ausencias. No se programan recordatorios de WhatsApp: se envían manualmente.
 
 ## Verificación
+
+La atención se realiza en casa de la dueña. La interfaz usa calendarios de React DayPicker en español y selectores accesibles de Radix para fechas, horas y opciones. Los desplegables se mantienen en la misma capa del modal para permitir teclado y toque. Los modales están centrados, bloquean el desplazamiento del fondo y animan su apertura y cierre. Motion y CSS aportan transiciones breves que respetan la preferencia de movimiento reducido. Cada sección tiene su propio skeleton y las acciones asíncronas muestran el progreso en el botón correspondiente.
 
 ```powershell
 npm run lint

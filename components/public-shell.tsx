@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Leaf, ArrowUpRight } from "lucide-react";
 import { Brand } from "./brand";
+import { PageTransition } from "./page-transition";
 export function PublicShell({
   children,
   demo = false,
@@ -22,7 +23,7 @@ export function PublicShell({
         </div>
       )}
       <main className="public-main" id="main-content">
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
       <footer className="public-footer">
         <Leaf size={17} />

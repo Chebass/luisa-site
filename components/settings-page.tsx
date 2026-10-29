@@ -1,4 +1,5 @@
 "use client";
+import { ModalPresence } from "./modal-presence";
 import { useEffect, useState } from "react";
 import {
   Save,
@@ -22,6 +23,7 @@ import { dayLabel, timeLabel } from "@/lib/dates";
 import { browserSupabase } from "@/lib/supabase/browser";
 import { clearOfflineAgenda } from "@/lib/offline";
 import { useRouter } from "next/navigation";
+import { TimePicker } from "./ui/time-picker";
 type InstallPrompt = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: string }>;
@@ -262,28 +264,20 @@ export function SettingsPage() {
               mantienen su hora de fin.
             </p>
             <div className="form-row">
-              <label>
-                Primera hora visible
-                <input
-                  type="time"
-                  required
-                  value={settings.visible_start}
-                  onChange={(e) =>
-                    setSettings({ ...settings, visible_start: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                Última hora visible
-                <input
-                  type="time"
-                  required
-                  value={settings.visible_end}
-                  onChange={(e) =>
-                    setSettings({ ...settings, visible_end: e.target.value })
-                  }
-                />
-              </label>
+              <TimePicker
+                label="Primera hora visible"
+                value={settings.visible_start}
+                onChange={(value) =>
+                  setSettings({ ...settings, visible_start: value })
+                }
+              />
+              <TimePicker
+                label="Última hora visible"
+                value={settings.visible_end}
+                onChange={(value) =>
+                  setSettings({ ...settings, visible_end: value })
+                }
+              />
             </div>
             <div className="form-row">
               <label>
@@ -333,7 +327,7 @@ export function SettingsPage() {
                 {error}
               </p>
             )}
-            <Button type="submit" disabled={busy}>
+            <Button type="submit" loading={busy} disabled={busy}>
               <Save size={18} />
               {busy ? "Guardando…" : "Guardar mis ajustes"}
             </Button>
@@ -484,45 +478,49 @@ export function SettingsPage() {
           )}
         </aside>
       </div>
-      {installInfo && (
-        <Modal
-          title="Tu agenda, a un toque"
-          onClose={() => setInstallInfo(false)}
-        >
-          <div className="stack-form">
-            <h3>En iPhone</h3>
+      <ModalPresence>
+        {installInfo && (
+          <Modal
+            title="Tu agenda, a un toque"
+            onClose={() => setInstallInfo(false)}
+          >
+            <div className="stack-form">
+              <h3>En iPhone</h3>
+              <p>
+                Abre esta página en Safari, toca Compartir y luego «Agregar a
+                pantalla de inicio».
+              </p>
+              <h3>En Android</h3>
+              <p>
+                Abre el menú de Chrome (⋮) y toca «Instalar aplicación» o
+                «Agregar a pantalla de inicio».
+              </p>
+              <Button onClick={() => setInstallInfo(false)}>Entendido</Button>
+            </div>
+          </Modal>
+        )}
+      </ModalPresence>
+      <ModalPresence>
+        {reset && (
+          <Modal
+            title="¿Reiniciar la demostración?"
+            onClose={() => setReset(false)}
+          >
             <p>
-              Abre esta página en Safari, toca Compartir y luego «Agregar a
-              pantalla de inicio».
+              Se eliminarán los cambios de prueba de este navegador y volverán
+              los datos ficticios iniciales.
             </p>
-            <h3>En Android</h3>
-            <p>
-              Abre el menú de Chrome (⋮) y toca «Instalar aplicación» o «Agregar
-              a pantalla de inicio».
-            </p>
-            <Button onClick={() => setInstallInfo(false)}>Entendido</Button>
-          </div>
-        </Modal>
-      )}
-      {reset && (
-        <Modal
-          title="¿Reiniciar la demostración?"
-          onClose={() => setReset(false)}
-        >
-          <p>
-            Se eliminarán los cambios de prueba de este navegador y volverán los
-            datos ficticios iniciales.
-          </p>
-          <div className="dialog-actions">
-            <Button variant="destructive" onClick={resetDemo}>
-              Reiniciar demostración
-            </Button>
-            <Button variant="outline" onClick={() => setReset(false)}>
-              Seguir probando
-            </Button>
-          </div>
-        </Modal>
-      )}
+            <div className="dialog-actions">
+              <Button variant="destructive" onClick={resetDemo}>
+                Reiniciar demostración
+              </Button>
+              <Button variant="outline" onClick={() => setReset(false)}>
+                Seguir probando
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </ModalPresence>
     </>
   );
 }

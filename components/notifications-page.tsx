@@ -1,4 +1,5 @@
 "use client";
+import { ModalPresence } from "./modal-presence";
 import { useState } from "react";
 import { Bell, CheckCheck, ArrowUpRight } from "lucide-react";
 import { useStore } from "./store-provider";
@@ -62,9 +63,11 @@ export function NotificationsPage() {
           </div>
         )}
       </div>
-      {detail && (
-        <AppointmentDetail id={detail} onClose={() => setDetail(null)} />
-      )}
+      <ModalPresence>
+        {detail && (
+          <AppointmentDetail id={detail} onClose={() => setDetail(null)} />
+        )}
+      </ModalPresence>
     </>
   );
 }

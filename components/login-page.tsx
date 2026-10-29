@@ -52,7 +52,7 @@ export function LoginPage({
           </p>
           <Leaf size={50} strokeWidth={1} />
         </div>
-        <small>LUISA · BIENESTAR A DOMICILIO</small>
+        <small>LUISA · TU ESPACIO DE BIENESTAR</small>
       </div>
       <section className="login-panel">
         <div className="login-form">

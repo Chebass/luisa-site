@@ -4,6 +4,7 @@ import { createDemoStore } from "@/lib/demo";
 import { loadStore } from "@/lib/server/data";
 import { StoreProvider } from "@/components/store-provider";
 import { AdminShell } from "@/components/admin-shell";
+import { PageTransition } from "@/components/page-transition";
 export const dynamic = "force-dynamic";
 export default async function AdminLayout({
   children,
@@ -23,7 +24,9 @@ export default async function AdminLayout({
   return (
     <StoreProvider initial={initial} demo={demo}>
       <AdminShell>
-        <div id="main-content">{children}</div>
+        <div>
+          <PageTransition>{children}</PageTransition>
+        </div>
       </AdminShell>
     </StoreProvider>
   );

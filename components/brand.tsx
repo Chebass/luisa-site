@@ -7,7 +7,7 @@ export function Brand({ href = "/inicio" }: { href?: string }) {
         <Flower2 strokeWidth={1.3} />
       </span>
       <span>
-        luisa<span className="brand-subtitle">BIENESTAR A DOMICILIO</span>
+        luisa<span className="brand-subtitle">TU ESPACIO DE BIENESTAR</span>
       </span>
     </Link>
   );

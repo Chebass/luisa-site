@@ -1,4 +1,5 @@
 "use client";
+import { ModalPresence } from "./modal-presence";
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -15,6 +16,7 @@ import { AppointmentDetail } from "./appointment-detail";
 import { AppointmentForm } from "./appointment-form";
 import { AppointmentCard } from "./appointment-card";
 import { dateKey, dayLabel, shiftDay, weekday, timeLabel } from "@/lib/dates";
+import { Select } from "./ui/select";
 export function CalendarPage() {
   const params = useSearchParams();
   const [day, setDay] = useState(params.get("dia") ?? dateKey());
@@ -95,18 +97,20 @@ export function CalendarPage() {
         <label className="sr-only" htmlFor="status-filter">
           Filtrar por estado
         </label>
-        <select
+        <Select
           id="status-filter"
+          label="Filtrar por estado"
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        >
-          <option value="active">Sin canceladas</option>
-          <option value="all">Todas las citas</option>
-          <option value="scheduled">Por confirmar</option>
-          <option value="confirmed">Confirmadas</option>
-          <option value="cancelled">Canceladas</option>
-          <option value="completed">Atendidas</option>
-        </select>
+          onValueChange={setFilter}
+          options={[
+            { value: "active", label: "Sin canceladas" },
+            { value: "all", label: "Todas las citas" },
+            { value: "scheduled", label: "Por confirmar" },
+            { value: "confirmed", label: "Confirmadas" },
+            { value: "cancelled", label: "Canceladas" },
+            { value: "completed", label: "Atendidas" },
+          ]}
+        />
       </div>
       <div className="calendar-legend">
         <span>
@@ -127,7 +131,10 @@ export function CalendarPage() {
         </span>
       </div>
       {view === "week" ? (
-        <div className="week-calendar">
+        <div
+          key={`week-${start}-${filter}`}
+          className="week-calendar interaction-reveal"
+        >
           {week.map((d) => {
             const appts = appointments
               .filter((a) => dateKey(a.start_at) === d)
@@ -213,7 +220,10 @@ export function CalendarPage() {
           })}
         </div>
       ) : (
-        <div className="month-calendar">
+        <div
+          key={`month-${month}-${filter}`}
+          className="month-calendar interaction-reveal"
+        >
           {[
             "Lunes",
             "Martes",
@@ -288,12 +298,16 @@ export function CalendarPage() {
           </div>
         )}
       </section>
-      {detail && (
-        <AppointmentDetail id={detail} onClose={() => setDetail(null)} />
-      )}{" "}
-      {create && (
-        <AppointmentForm initialDay={day} onClose={() => setCreate(false)} />
-      )}
+      <ModalPresence>
+        {detail && (
+          <AppointmentDetail id={detail} onClose={() => setDetail(null)} />
+        )}
+      </ModalPresence>{" "}
+      <ModalPresence>
+        {create && (
+          <AppointmentForm initialDay={day} onClose={() => setCreate(false)} />
+        )}
+      </ModalPresence>
     </>
   );
 }

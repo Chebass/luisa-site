@@ -19,6 +19,17 @@ import { useStore } from "./store-provider";
 import { browserSupabase } from "@/lib/supabase/browser";
 import { dayLabel } from "@/lib/dates";
 import { clearOfflineAgenda } from "@/lib/offline";
+import { useEffect, useState } from "react";
+import { ModuleSkeleton, type ModuleName } from "./module-skeleton";
+const modules = new Set([
+  "inicio",
+  "calendario",
+  "clientes",
+  "disponibilidad",
+  "ajustes",
+  "notificaciones",
+  "mas",
+]);
 const navigation = [
   { href: "/inicio", label: "Mi día", icon: Home },
   { href: "/calendario", label: "Calendario", icon: CalendarDays },
@@ -29,10 +40,35 @@ const navigation = [
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [pending, setPending] = useState<ModuleName | null>(null);
+  useEffect(() => {
+    setPending(null);
+  }, [pathname]);
+  useEffect(() => {
+    if (!pending) return;
+    const timer = setTimeout(() => setPending(null), 15000);
+    return () => clearTimeout(timer);
+  }, [pending]);
   const { store, demo, online } = useStore();
   const unread = store.notifications.filter((n) => !n.read_at).length;
   return (
-    <div className="app-shell">
+    <div
+      className="app-shell"
+      onClickCapture={(e) => {
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey)
+          return;
+        const a = (e.target as HTMLElement).closest("a[href]");
+        if (!(a instanceof HTMLAnchorElement) || a.target === "_blank") return;
+        const url = new URL(a.href);
+        const section = url.pathname.slice(1);
+        if (
+          url.origin === location.origin &&
+          url.pathname !== pathname &&
+          modules.has(section)
+        )
+          setPending(section as ModuleName);
+      }}
+    >
       <aside className="sidebar">
         <Brand />
         <div className="sidebar-caption">TU ESPACIO DE CUIDADO</div>
@@ -119,7 +155,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             Demostración · Datos ficticios guardados solo en este navegador
           </div>
         )}
-        <main className="page-content">{children}</main>
+        <main
+          id="main-content"
+          className="page-content"
+          aria-busy={Boolean(pending)}
+        >
+          {pending && <ModuleSkeleton module={pending} />}
+          <div hidden={Boolean(pending)}>{children}</div>
+        </main>
         <footer className="desktop-footer">
           <span>Hecho para llevar tus días con calma.</span>
           <span>Luisa · bienestar</span>

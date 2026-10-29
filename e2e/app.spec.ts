@@ -25,7 +25,7 @@ test("owner can browse, open appointments, inspect clients and plan time", async
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(
     page.getByRole("combobox", { name: "Día de la semana" }),
-  ).toHaveValue("0");
+  ).toContainText("Domingo");
   await page.getByRole("button", { name: "Cerrar", exact: true }).click();
   await page.goto("/calendario");
   await page.getByRole("button", { name: "Mes", exact: true }).click();
@@ -149,7 +149,13 @@ test("an owner override requires an explicit confirmation and still creates a no
   await dialog
     .getByRole("textbox", { name: "Celular", exact: true })
     .fill("977666555");
-  await dialog.getByLabel("Día de la cita").fill(sunday);
+  await page
+    .getByRole("button", { name: "Día de la cita", exact: true })
+    .click();
+  const picker = page.locator(".zen-date-popover");
+  if ((await picker.locator(`[data-day="${sunday}"] button`).count()) === 0)
+    await picker.getByRole("button", { name: "Ir al mes siguiente" }).click();
+  await picker.locator(`[data-day="${sunday}"] button`).click();
   await expect(
     dialog.getByText("No hay horarios libres este día. Prueba otra fecha."),
   ).toBeVisible();

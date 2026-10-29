@@ -11,6 +11,8 @@ import {
 import { PublicShell } from "./public-shell";
 import { Button } from "./ui/button";
 import { dateKey, dayLabel, timeLabel } from "@/lib/dates";
+import { DatePicker } from "./ui/date-picker";
+import { SlotsSkeleton } from "./ui/skeleton";
 type Summary = {
   start_at: string;
   end_at: string;
@@ -34,6 +36,7 @@ export function TokenPage({
   const [day, setDay] = useState(dateKey());
   const [slots, setSlots] = useState<{ start_at: string }[]>([]);
   const [selected, setSelected] = useState("");
+  const [slotsLoading, setSlotsLoading] = useState(action === "modificar");
   const started = useRef(false);
   const perform = useCallback(
     async (which: string, start?: string) => {
@@ -87,6 +90,7 @@ export function TokenPage({
   useEffect(() => {
     if (action !== "modificar" || demo) return;
     let active = true;
+    setSlotsLoading(true);
     setSelected("");
     async function load() {
       try {
@@ -98,6 +102,8 @@ export function TokenPage({
         if (active) setSlots(b.slots);
       } catch (e) {
         if (active) setError((e as Error).message);
+      } finally {
+        if (active) setSlotsLoading(false);
       }
     }
     void load();
@@ -157,29 +163,29 @@ export function TokenPage({
             </span>
           </div>
         )}
-        {busy && (
-          <div className="loading-state">
-            <span className="spinner" />
-            <p>
-              {action === "confirmar"
-                ? "Confirmando tu cita…"
-                : "Guardando el cambio…"}
-            </p>
-          </div>
+        {busy && action === "confirmar" && (
+          <Button loading disabled>
+            Confirmando tu cita…
+          </Button>
         )}
+        {!summary && !busy && !error && <SlotsSkeleton />}
         {error && (
           <p className="form-error" role="alert">
             {error}
           </p>
         )}
         <div className="stack-form">
-          {!busy && !done && summary && action === "cancelar" && (
+          {!done && summary && action === "cancelar" && (
             <>
               <p>
                 Si cancelas, el horario se libera. Para otra fecha tendrás que
                 reservar de nuevo o cambiar el horario.
               </p>
-              <Button variant="destructive" onClick={() => perform("cancel")}>
+              <Button
+                loading={busy}
+                variant="destructive"
+                onClick={() => perform("cancel")}
+              >
                 Sí, cancelar mi cita
               </Button>
               <Button variant="outline" asChild>
@@ -191,35 +197,40 @@ export function TokenPage({
               </Link>
             </>
           )}
-          {!busy && !done && summary && action === "modificar" && (
+          {!done && summary && action === "modificar" && (
             <>
               <label>
                 Elige un nuevo día
-                <input
-                  type="date"
+                <DatePicker
+                  label="Elige un nuevo día"
                   value={day}
                   min={dateKey()}
-                  onChange={(e) => {
-                    setDay(e.target.value);
+                  onChange={(value) => {
+                    setDay(value);
                     setError("");
                   }}
                 />
               </label>
-              <div className="time-grid">
-                {slots.map((s) => (
-                  <button
-                    key={s.start_at}
-                    className={`time-slot ${selected === s.start_at ? "selected" : ""}`}
-                    onClick={() => setSelected(s.start_at)}
-                  >
-                    {timeLabel(s.start_at)}
-                  </button>
-                ))}
-              </div>
-              {!slots.length && (
+              {slotsLoading ? (
+                <SlotsSkeleton />
+              ) : (
+                <div key={day} className="time-grid interaction-reveal">
+                  {slots.map((s) => (
+                    <button
+                      key={s.start_at}
+                      className={`time-slot ${selected === s.start_at ? "selected" : ""}`}
+                      onClick={() => setSelected(s.start_at)}
+                    >
+                      {timeLabel(s.start_at)}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {!slotsLoading && !slots.length && (
                 <p>No hay horarios libres este día. Prueba otra fecha.</p>
               )}
               <Button
+                loading={busy}
                 disabled={!selected}
                 onClick={() => perform("move", selected)}
               >

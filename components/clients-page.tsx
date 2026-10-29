@@ -1,4 +1,5 @@
 "use client";
+import { ModalPresence } from "./modal-presence";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
@@ -153,198 +154,212 @@ export function ClientsPage() {
           </p>
         </div>
       )}
-      {client && !edit && !booking && (
-        <Modal
-          title="Su espacio de bienestar"
-          onClose={() => setSelected(null)}
-          wide
-        >
-          <div className="client-profile">
-            <span className="avatar avatar-large">{client.name[0]}</span>
-            <div>
-              <h2>{client.name}</h2>
-              <p>+{client.phone}</p>
+      <ModalPresence>
+        {client && !edit && !booking && (
+          <Modal
+            title="Su espacio de bienestar"
+            onClose={() => setSelected(null)}
+            wide
+          >
+            <div className="client-profile">
+              <span className="avatar avatar-large">{client.name[0]}</span>
+              <div>
+                <h2>{client.name}</h2>
+                <p>+{client.phone}</p>
+              </div>
             </div>
-          </div>
-          <div className="profile-stats">
-            <span>
-              <strong>{history.length}</strong>Citas en total
-            </span>
-            <span>
-              <strong>
-                {history.filter((a) => a.status === "completed").length}
-              </strong>
-              Atendidas
-            </span>
-            <span>
-              <strong>
-                {history.filter((a) => a.status === "cancelled").length}
-              </strong>
-              Canceladas
-            </span>
-          </div>
-          <div className="detail-contact">
-            <Button onClick={() => setBooking(client.id)}>
-              <Plus size={18} />
-              Agendar cita
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (demo) {
-                  toast("Este teléfono es ficticio.");
-                  return;
-                }
-                window.open(
-                  whatsappLink(
-                    client.phone,
-                    `Hola ${client.name}, soy ${store.settings.owner_name}.`,
-                  ),
-                  "_blank",
-                  "noopener,noreferrer",
-                );
-              }}
-            >
-              <MessageCircle size={18} />
-              WhatsApp
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setError("");
-                setEdit({ ...client });
-              }}
-            >
-              Editar ficha
-            </Button>
-          </div>
-          <h3>Notas privadas</h3>
-          <p className="note-box">
-            {client.notes || "Todavía no has añadido notas."}
-          </p>
-          <p className="field-help">
-            Solo tú puedes ver estas notas. Evita guardar información clínica.
-          </p>
-          <h3 className="history-heading">Sus citas</h3>
-          <div className="client-history">
-            {history.map((a) => (
-              <button key={a.id} onClick={() => setDetail(a.id)}>
-                <CalendarDays size={21} />
-                <span>
-                  <strong>{dayLabel(a.start_at, "EEEE d MMM")}</strong>
-                  <small>
-                    {timeLabel(a.start_at)} ·{" "}
-                    {dateKey(a.start_at) < dateKey() ? "Pasada" : "Próxima"}
-                  </small>
-                </span>
-                <span className={`status status-${a.status}`}>
-                  {statusLabels[a.status]}
-                </span>
-                <ArrowUpRight size={18} />
-              </button>
-            ))}
-            {!history.length && (
-              <p className="empty-inline">Todavía no tiene citas.</p>
-            )}
-          </div>
-          {confirmArchive ? (
-            <div className="confirmation-box">
-              <p>
-                Se conservará todo su historial. Si vuelve a reservar, su ficha
-                se reactivará.
-              </p>
+            <div className="profile-stats">
+              <span>
+                <strong>{history.length}</strong>Citas en total
+              </span>
+              <span>
+                <strong>
+                  {history.filter((a) => a.status === "completed").length}
+                </strong>
+                Atendidas
+              </span>
+              <span>
+                <strong>
+                  {history.filter((a) => a.status === "cancelled").length}
+                </strong>
+                Canceladas
+              </span>
+            </div>
+            <div className="detail-contact">
+              <Button onClick={() => setBooking(client.id)}>
+                <Plus size={18} />
+                Agendar cita
+              </Button>
               <Button
-                variant="destructive"
-                disabled={busy}
-                onClick={async () => {
-                  try {
-                    await mutate({
-                      kind: "client",
-                      value: {
-                        ...client,
-                        archived_at: new Date().toISOString(),
-                      },
-                    });
-                    setSelected(null);
-                    setConfirmArchive(false);
-                    toast("Cliente archivado.");
-                  } catch (e) {
-                    toast((e as Error).message);
+                variant="outline"
+                onClick={() => {
+                  if (demo) {
+                    toast("Este teléfono es ficticio.");
+                    return;
                   }
+                  window.open(
+                    whatsappLink(
+                      client.phone,
+                      `Hola ${client.name}, soy ${store.settings.owner_name}.`,
+                    ),
+                    "_blank",
+                    "noopener,noreferrer",
+                  );
                 }}
               >
-                Sí, archivar cliente
+                <MessageCircle size={18} />
+                WhatsApp
               </Button>
-              <Button variant="ghost" onClick={() => setConfirmArchive(false)}>
-                Mantener activo
-              </Button>
-            </div>
-          ) : (
-            !client.archived_at && (
               <Button
                 variant="ghost"
-                className="danger-text"
-                onClick={() => setConfirmArchive(true)}
+                onClick={() => {
+                  setError("");
+                  setEdit({ ...client });
+                }}
               >
-                <Archive size={17} />
-                Archivar cliente
+                Editar ficha
               </Button>
-            )
-          )}
-        </Modal>
-      )}
-      {edit && (
-        <Modal
-          title={edit.id ? "Editar ficha" : "Agregar un cliente"}
-          onClose={() => setEdit(null)}
-        >
-          <form className="stack-form" onSubmit={save}>
-            <label>
-              Nombre
-              <input
-                required
-                minLength={2}
-                maxLength={100}
-                value={edit.name ?? ""}
-                onChange={(e) => setEdit({ ...edit, name: e.target.value })}
-              />
-            </label>
-            <label>
-              Celular
-              <input
-                required
-                inputMode="tel"
-                value={edit.phone ?? ""}
-                onChange={(e) => setEdit({ ...edit, phone: e.target.value })}
-              />
-            </label>
-            <label>
-              Notas privadas
-              <textarea
-                rows={4}
-                maxLength={2000}
-                value={edit.notes ?? ""}
-                onChange={(e) => setEdit({ ...edit, notes: e.target.value })}
-                placeholder="Preferencias o detalles para recordar. Sin datos de salud."
-              />
-            </label>
-            {error && (
-              <p className="form-error" role="alert">
-                {error}
-              </p>
+            </div>
+            <h3>Notas privadas</h3>
+            <p className="note-box">
+              {client.notes || "Todavía no has añadido notas."}
+            </p>
+            <p className="field-help">
+              Solo tú puedes ver estas notas. Evita guardar información clínica.
+            </p>
+            <h3 className="history-heading">Sus citas</h3>
+            <div className="client-history">
+              {history.map((a) => (
+                <button key={a.id} onClick={() => setDetail(a.id)}>
+                  <CalendarDays size={21} />
+                  <span>
+                    <strong>{dayLabel(a.start_at, "EEEE d MMM")}</strong>
+                    <small>
+                      {timeLabel(a.start_at)} ·{" "}
+                      {dateKey(a.start_at) < dateKey() ? "Pasada" : "Próxima"}
+                    </small>
+                  </span>
+                  <span className={`status status-${a.status}`}>
+                    {statusLabels[a.status]}
+                  </span>
+                  <ArrowUpRight size={18} />
+                </button>
+              ))}
+              {!history.length && (
+                <p className="empty-inline">Todavía no tiene citas.</p>
+              )}
+            </div>
+            {confirmArchive ? (
+              <div className="confirmation-box">
+                <p>
+                  Se conservará todo su historial. Si vuelve a reservar, su
+                  ficha se reactivará.
+                </p>
+                <Button
+                  variant="destructive"
+                  disabled={busy}
+                  onClick={async () => {
+                    try {
+                      await mutate({
+                        kind: "client",
+                        value: {
+                          ...client,
+                          archived_at: new Date().toISOString(),
+                        },
+                      });
+                      setSelected(null);
+                      setConfirmArchive(false);
+                      toast("Cliente archivado.");
+                    } catch (e) {
+                      toast((e as Error).message);
+                    }
+                  }}
+                >
+                  Sí, archivar cliente
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setConfirmArchive(false)}
+                >
+                  Mantener activo
+                </Button>
+              </div>
+            ) : (
+              !client.archived_at && (
+                <Button
+                  variant="ghost"
+                  className="danger-text"
+                  onClick={() => setConfirmArchive(true)}
+                >
+                  <Archive size={17} />
+                  Archivar cliente
+                </Button>
+              )
             )}
-            <Button disabled={busy}>
-              {busy ? "Guardando…" : "Guardar ficha"}
-            </Button>
-          </form>
-        </Modal>
-      )}
-      {booking && (
-        <AppointmentForm clientId={booking} onClose={() => setBooking(null)} />
-      )}{" "}
-      {detail && (
-        <AppointmentDetail id={detail} onClose={() => setDetail(null)} />
-      )}
+          </Modal>
+        )}
+      </ModalPresence>
+      <ModalPresence>
+        {edit && (
+          <Modal
+            title={edit.id ? "Editar ficha" : "Agregar un cliente"}
+            onClose={() => setEdit(null)}
+          >
+            <form className="stack-form" onSubmit={save}>
+              <label>
+                Nombre
+                <input
+                  required
+                  minLength={2}
+                  maxLength={100}
+                  value={edit.name ?? ""}
+                  onChange={(e) => setEdit({ ...edit, name: e.target.value })}
+                />
+              </label>
+              <label>
+                Celular
+                <input
+                  required
+                  inputMode="tel"
+                  value={edit.phone ?? ""}
+                  onChange={(e) => setEdit({ ...edit, phone: e.target.value })}
+                />
+              </label>
+              <label>
+                Notas privadas
+                <textarea
+                  rows={4}
+                  maxLength={2000}
+                  value={edit.notes ?? ""}
+                  onChange={(e) => setEdit({ ...edit, notes: e.target.value })}
+                  placeholder="Preferencias o detalles para recordar. Sin datos de salud."
+                />
+              </label>
+              {error && (
+                <p className="form-error" role="alert">
+                  {error}
+                </p>
+              )}
+              <Button loading={busy} disabled={busy}>
+                {busy ? "Guardando…" : "Guardar ficha"}
+              </Button>
+            </form>
+          </Modal>
+        )}
+      </ModalPresence>
+      <ModalPresence>
+        {booking && (
+          <AppointmentForm
+            clientId={booking}
+            onClose={() => setBooking(null)}
+          />
+        )}
+      </ModalPresence>{" "}
+      <ModalPresence>
+        {detail && (
+          <AppointmentDetail id={detail} onClose={() => setDetail(null)} />
+        )}
+      </ModalPresence>
     </>
   );
 }

@@ -18,6 +18,7 @@ import {
   normalizePhone,
 } from "@/lib/whatsapp";
 import type { Appointment } from "@/lib/types";
+import { DatePicker } from "./ui/date-picker";
 export function AppointmentForm({
   onClose,
   clientId,
@@ -287,14 +288,14 @@ export function AppointmentForm({
             <span>
               <CalendarDays size={18} /> Día de la cita
             </span>
-            <input
-              type="date"
+            <DatePicker
+              label="Día de la cita"
               required
               value={day}
               min={dateKey()}
               max={shiftDay(dateKey(), 90)}
-              onChange={(e) => {
-                setDay(e.target.value);
+              onChange={(value) => {
+                setDay(value);
                 setSelected("");
               }}
             />
@@ -345,7 +346,7 @@ export function AppointmentForm({
               {error}
             </p>
           )}
-          <Button type="submit" disabled={busy || !selected}>
+          <Button type="submit" loading={busy} disabled={busy || !selected}>
             {busy ? "Guardando…" : "Guardar cita"}
             <ArrowRight size={18} />
           </Button>

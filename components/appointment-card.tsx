@@ -1,10 +1,12 @@
 "use client";
+import { useState } from "react";
 import {
   ArrowUpRight,
   Check,
   MessageCircle,
   MoreHorizontal,
   Clock3,
+  LoaderCircle,
 } from "lucide-react";
 import { useStore } from "./store-provider";
 import type { Appointment } from "@/lib/types";
@@ -21,9 +23,11 @@ export function AppointmentCard({
   compact?: boolean;
 }) {
   const { store, mutate, toast, demo } = useStore();
+  const [pending, setPending] = useState(false);
   const client = store.clients.find((c) => c.id === a.client_id);
   if (!client) return null;
   async function remind() {
+    setPending(true);
     try {
       if (demo) {
         await mutate({
@@ -55,6 +59,8 @@ export function AppointmentCard({
       else window.location.assign(url);
     } catch (e) {
       toast((e as Error).message);
+    } finally {
+      setPending(false);
     }
   }
   return (
@@ -82,7 +88,7 @@ export function AppointmentCard({
           </button>
         </div>
         <div className="appointment-meta">
-          <span>Masaje a domicilio</span>
+          <span>Sesión de masaje</span>
           <span className={`status status-${a.status}`}>
             {a.status === "confirmed" ? (
               <Check size={12} />
@@ -102,8 +108,14 @@ export function AppointmentCard({
           <button
             className={`reminder-button ${a.reminder_sent_at ? "reminded" : ""}`}
             onClick={remind}
+            disabled={pending}
+            aria-busy={pending}
           >
-            <MessageCircle size={18} />
+            {pending ? (
+              <LoaderCircle className="button-spinner" size={18} />
+            ) : (
+              <MessageCircle size={18} />
+            )}
             <span>
               {a.reminder_sent_at
                 ? "Recordar otra vez"

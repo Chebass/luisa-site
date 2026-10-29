@@ -24,6 +24,7 @@ import { createDemoStore, defaultSettings } from "@/lib/demo";
 import { bookingSchema } from "@/lib/validation";
 import { appointmentMessage, whatsappLink } from "@/lib/whatsapp";
 import type { Store } from "@/lib/types";
+import { SlotsSkeleton, Skeleton } from "./ui/skeleton";
 type Result = { start_at: string; end_at: string; whatsapp: string };
 export function BookingPage({ demo }: { demo: boolean }) {
   const router = useRouter();
@@ -272,13 +273,13 @@ export function BookingPage({ demo }: { demo: boolean }) {
           <p>
             Regálate una pausa de bienestar,
             <br />
-            en la comodidad de tu hogar.
+            en nuestro espacio de atención.
           </p>
           <div className="service-summary">
             <span className="service-icon">
               <Leaf size={30} strokeWidth={1.3} />
             </span>
-            <h2>Masaje a domicilio</h2>
+            <h2>Tu sesión de masaje</h2>
             <p>Un espacio para soltar y recargar.</p>
             <div>
               <span>
@@ -287,7 +288,7 @@ export function BookingPage({ demo }: { demo: boolean }) {
               </span>
               <span>
                 <MapPin size={17} />
-                Vamos a tu hogar
+                Te recibimos en casa
               </span>
             </div>
           </div>
@@ -369,12 +370,12 @@ export function BookingPage({ demo }: { demo: boolean }) {
                 <small>Hora de Perú</small>
               </div>
               {loading ? (
-                <div className="loading-state">
-                  <span className="spinner" />
-                  <p>Buscando tu momento…</p>
-                </div>
+                <SlotsSkeleton />
               ) : (
-                <div className="time-grid booking-time-grid">
+                <div
+                  key={day}
+                  className="time-grid booking-time-grid interaction-reveal"
+                >
                   {slots.map((s) => (
                     <button
                       className={`time-slot ${start === s.start_at ? "selected" : ""}`}
@@ -507,7 +508,11 @@ export function BookingPage({ demo }: { demo: boolean }) {
                     )}
                   </div>
                 )}
-                <Button type="submit" disabled={busy || (!demo && !token)}>
+                <Button
+                  type="submit"
+                  loading={busy}
+                  disabled={busy || (!demo && !token)}
+                >
                   <MessageCircle size={20} />
                   {busy
                     ? "Guardando tu momento…"
@@ -556,8 +561,9 @@ export function BookingPage({ demo }: { demo: boolean }) {
               </Link>
             </div>
           ) : (
-            <div className="loading-state">
-              <span className="spinner" />
+            <div role="status" aria-label="Preparando tu reserva">
+              <Skeleton className="sk-panel" />
+              <Skeleton className="sk-action" />
             </div>
           )}
         </section>
