@@ -10,7 +10,6 @@ import {
   Bell,
   ArrowUpRight,
   MoreHorizontal,
-  Leaf,
   LogOut,
   WifiOff,
 } from "lucide-react";
@@ -88,14 +87,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <div className="sidebar-note">
-            <Leaf size={23} strokeWidth={1.4} />
-            <p>
-              Cuidar de otros empieza
-              <br />
-              por cuidar de ti.
-            </p>
-          </div>
           <Link href="/reservar" className="public-link" target="_blank">
             Ver página de reservas <ArrowUpRight size={18} />
           </Link>

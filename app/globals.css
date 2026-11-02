@@ -304,9 +304,11 @@ em {
   width: 248px;
   background: #f3e1e5;
   border-right: 1px solid var(--line);
-  padding: 37px 23px 22px;
+  padding: 26px 23px 18px;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   z-index: 20;
 }
 .brand {
@@ -316,7 +318,7 @@ em {
 }
 .brand-logo {
   display: block;
-  width: 168px;
+  width: 150px;
   height: auto;
 }
 .sidebar .brand {
@@ -326,15 +328,15 @@ em {
   font-size: 9px;
   letter-spacing: 1.8px;
   color: #995667;
-  margin: 58px 15px 19px;
+  margin: 18px 15px 12px;
 }
 .sidebar nav {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
 }
 .nav-link {
-  height: 54px;
+  height: 50px;
   display: flex;
   align-items: center;
   gap: 13px;
@@ -360,16 +362,7 @@ em {
 }
 .sidebar-bottom {
   margin-top: auto;
-  padding-top: 60px;
-}
-.sidebar-note {
-  padding: 25px 17px;
-  color: #a86475;
-  font-size: 13px;
-  line-height: 1.7;
-}
-.sidebar-note p {
-  margin-top: 12px;
+  padding-top: 16px;
 }
 .public-link {
   font-size: 12px;
@@ -379,7 +372,7 @@ em {
   padding: 13px 14px;
   border-top: 1px solid #e3ccd2;
   border-bottom: 1px solid #e3ccd2;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
 }
 .owner-profile {
   display: flex;
@@ -4413,5 +4406,31 @@ em {
   }
   .client-name {
     font-size: 18px;
+  }
+}
+
+@media (max-height: 700px) and (min-width: 761px) {
+  .sidebar {
+    padding-top: 18px;
+    padding-bottom: 14px;
+  }
+  .sidebar .brand-logo {
+    width: 118px;
+  }
+  .sidebar-caption {
+    margin: 12px 15px 8px;
+  }
+  .sidebar nav {
+    gap: 4px;
+  }
+  .sidebar .nav-link {
+    height: 48px;
+  }
+  .sidebar-bottom {
+    padding-top: 10px;
+  }
+  .public-link {
+    padding: 9px 14px;
+    margin-bottom: 10px;
   }
 }
