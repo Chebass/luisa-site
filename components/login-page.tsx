@@ -75,7 +75,7 @@ export function LoginPage({
           </p>
           <Leaf size={50} strokeWidth={1} />
         </div>
-        <small>LUISA · TU ESPACIO DE BIENESTAR</small>
+        <small>HEALTH AND BEAUTY · SALÓN DE MASAJES Y TERAPIA FÍSICA</small>
       </div>
       <section className="login-panel">
         <div className="login-form">

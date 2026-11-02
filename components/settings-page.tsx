@@ -185,12 +185,25 @@ export function SettingsPage() {
                   <UserRound size={23} />
                 </span>
                 <h2>Tu información</h2>
-                <p>Así te verán tus clientes.</p>
+                <p>
+                  El nombre del negocio es el que ven tus clientes en WhatsApp.
+                </p>
               </div>
             </div>
             <div className="form-row">
               <label>
                 Tu nombre
+                <input
+                  required
+                  minLength={2}
+                  value={settings.display_name ?? ""}
+                  onChange={(e) =>
+                    setSettings({ ...settings, display_name: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Nombre del negocio
                 <input
                   required
                   minLength={2}
@@ -411,7 +424,8 @@ export function SettingsPage() {
             <Smartphone size={27} strokeWidth={1.5} />
             <h3>Siempre a mano</h3>
             <p>
-              Agrega Luisa a tu pantalla de inicio para abrirla como una app.
+              Agrega Health and Beauty a tu pantalla de inicio para abrirla como
+              una app.
             </p>
             <Button
               variant="outline"

@@ -3,7 +3,8 @@ import { defaultTemplates } from "./templates";
 import type { Appointment, Store } from "./types";
 export const defaultSettings = {
   id: 1,
-  owner_name: "Luisa",
+  owner_name: "Health and Beauty",
+  display_name: "Luisa",
   owner_phone: "51982280618",
   slot_minutes: 40,
   booking_window_days: 14,

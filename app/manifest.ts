@@ -1,13 +1,13 @@
 import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Luisa · bienestar",
-    short_name: "Luisa",
+    name: "Health and Beauty",
+    short_name: "Health & Beauty",
     description: "Tu agenda en orden, tu mente en calma.",
     start_url: "/inicio",
     display: "standalone",
-    background_color: "#f6f4ee",
-    theme_color: "#5b6548",
+    background_color: "#fcf3f4",
+    theme_color: "#b94a68",
     lang: "es-PE",
     icons: [
       {

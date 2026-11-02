@@ -41,7 +41,7 @@ La demostración se desactiva siempre con `NODE_ENV=production`, incluso si algu
 
 4. En **Supabase → Authentication**, habilitar el proveedor **Email** para correo y contraseña. Desactivar el registro de nuevos usuarios (**Allow new users to sign up**) y mantener Google deshabilitado. En **Authentication → Users**, crear manualmente la cuenta de la dueña con ese mismo correo y una contraseña; marcar el correo como confirmado al crearla. Esta cuenta de Auth es distinta de la fila `owner_access`: hacen falta ambas. No guardar la contraseña en `.env.local`, SQL ni Git. Supabase guarda el hash con bcrypt y emite los JWT y refresh tokens. No se necesita configurar Google, un secreto JWT propio ni una tabla de contraseñas. [Contraseñas de Supabase](https://supabase.com/docs/guides/auth/passwords), [almacenamiento de hashes](https://supabase.com/docs/guides/auth/password-security).
 5. Abrir `/login` e ingresar con el correo y contraseña de esa cuenta. El correo funciona como usuario de acceso. Después de autenticar, la app verifica la autorización en el servidor; una cuenta distinta se cierra únicamente en ese dispositivo y no entra al panel. El servidor también comprueba la identidad con `getUser()` en cada endpoint privado. Las políticas RLS conservan la lista de acceso.
-6. Revisar Ajustes: nombre, WhatsApp, duración, horarios, anticipación y mensajes.
+6. Revisar Ajustes: tu nombre (el que ve el panel), nombre del negocio (el que ven los clientes en WhatsApp), WhatsApp, duración, horarios, anticipación y mensajes.
 
 El correo de pruebas ya se dejó en el `.env.local` de esta máquina; no se versiona. Las claves y contraseñas no deben enviarse por el chat ni guardarse en Git. El número de pruebas se usa en los datos ficticios; reemplazarlo al activar la app real.
 
@@ -54,6 +54,8 @@ Supabase permite por defecto sesiones simultáneas sin límite de duración prog
 **Cerrar sesión** afecta solo al dispositivo actual: se usa `signOut({ scope: 'local' })`, se eliminan sus cookies y su copia privada sin conexión. Las otras sesiones permanecen activas. Las pestañas del mismo navegador comparten sesión. Borrar datos del navegador, usar navegación privada, revocar la cuenta o cambiar la contraseña puede requerir volver a ingresar. No se promete persistencia si el navegador elimina el almacenamiento. [Cierre de sesión](https://supabase.com/docs/guides/auth/signout).
 
 Si se olvida la contraseña, administrarla desde Supabase Auth. La app no ofrece autorregistro ni envía correos automáticos de recuperación en este alcance.
+
+**Actualización de marca (nombre del panel):** si la base ya existe, ejecutar una sola vez `supabase/migrations/202611020001_display_name.sql` en el editor SQL de Supabase **antes** de desplegar. Agrega `settings.display_name` ("Luisa"). El logo está en `public/logo.webp`; los íconos de la PWA se regeneran con `node scripts/generate-icons.mjs` a partir de `public/icon.svg`.
 
 ## Reserva pública y protección
 

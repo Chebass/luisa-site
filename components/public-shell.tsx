@@ -28,7 +28,7 @@ export function PublicShell({
       <footer className="public-footer">
         <Leaf size={17} />
         <span>Un momento para ti. Un poquito más de calma.</span>
-        <span>Luisa · bienestar</span>
+        <span>Health and Beauty · Salón de masajes y terapia física</span>
       </footer>
     </div>
   );

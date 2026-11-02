@@ -14,7 +14,7 @@ import {
   LogOut,
   WifiOff,
 } from "lucide-react";
-import { Brand } from "./brand";
+import { Brand, BrandLogo } from "./brand";
 import { useStore } from "./store-provider";
 import { browserSupabase } from "@/lib/supabase/browser";
 import { dayLabel } from "@/lib/dates";
@@ -51,6 +51,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(timer);
   }, [pending]);
   const { store, demo, online, toast } = useStore();
+  const personName = store.settings.display_name || store.settings.owner_name;
   const unread = store.notifications.filter((n) => !n.read_at).length;
   return (
     <div
@@ -99,11 +100,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             Ver página de reservas <ArrowUpRight size={18} />
           </Link>
           <div className="owner-profile">
-            <span className="avatar owner-avatar">
-              {store.settings.owner_name[0]}
-            </span>
+            <span className="avatar owner-avatar">{personName[0]}</span>
             <span>
-              <strong>{store.settings.owner_name}</strong>
+              <strong>{personName}</strong>
               <small>Tu espacio personal</small>
             </span>
             {!demo && (
@@ -134,7 +133,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             Un espacio para organizarte, sin prisa.
           </span>
           <span className="mobile-brand">
-            luisa<span>bienestar</span>
+            <BrandLogo />
           </span>
           <div className="topbar-right">
             <span className="topbar-date">
@@ -149,9 +148,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Bell size={23} strokeWidth={1.6} />
               {unread > 0 && <span className="notification-dot" />}
             </Link>
-            <span className="avatar topbar-avatar">
-              {store.settings.owner_name[0]}
-            </span>
+            <span className="avatar topbar-avatar">{personName[0]}</span>
           </div>
         </header>
         {demo && (
@@ -170,7 +167,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </main>
         <footer className="desktop-footer">
           <span>Hecho para llevar tus días con calma.</span>
-          <span>Luisa · bienestar</span>
+          <span>Health and Beauty</span>
         </footer>
       </div>
       <nav className="bottom-nav" aria-label="Navegación móvil">
