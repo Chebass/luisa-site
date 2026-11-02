@@ -41,6 +41,7 @@ export const config = {
     "/notificaciones/:path*",
     "/mas/:path*",
     "/api/admin",
+    "/api/admin/events",
     "/api/push",
   ],
 };

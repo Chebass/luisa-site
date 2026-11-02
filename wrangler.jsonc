@@ -5,6 +5,7 @@
   "compatibility_date": "2026-10-29",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "workers_dev": true,
+  "observability": { "enabled": true },
   "keep_vars": true,
   "vars": {
     "DEPLOYMENT_PLATFORM": "cloudflare",
