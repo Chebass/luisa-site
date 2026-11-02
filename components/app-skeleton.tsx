@@ -1,4 +1,4 @@
-import { Flower2 } from "lucide-react";
+import { BrandLogo } from "./brand";
 import { ModuleSkeleton } from "./module-skeleton";
 import { Skeleton } from "./ui/skeleton";
 
@@ -8,10 +8,7 @@ export function AppSkeleton() {
     <div className="app-shell app-loading-shell" aria-busy="true">
       <aside className="sidebar" aria-hidden="true">
         <div className="skeleton-brand">
-          <Flower2 size={42} strokeWidth={1.3} />
-          <span>
-            luisa<small>BIENESTAR</small>
-          </span>
+          <BrandLogo />
         </div>
         <div className="skeleton-sidebar-nav">
           {Array.from({ length: 5 }, (_, i) => (
@@ -27,7 +24,7 @@ export function AppSkeleton() {
         <header className="topbar">
           <span className="topbar-name">Estamos preparando tu espacio…</span>
           <span className="mobile-brand">
-            luisa<span>bienestar</span>
+            <BrandLogo />
           </span>
           <div className="topbar-right" aria-hidden="true">
             <Skeleton className="sk-header-date" />

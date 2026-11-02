@@ -41,6 +41,7 @@ export type Block = {
 export type Settings = {
   id: number;
   owner_name: string;
+  display_name: string;
   owner_phone: string;
   slot_minutes: number;
   booking_window_days: number;

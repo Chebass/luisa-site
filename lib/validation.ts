@@ -23,6 +23,7 @@ export const bookingSchema = z.object({
 export const settingsSchema = z
   .object({
     owner_name: z.string().trim().min(2).max(80),
+    display_name: z.string().trim().min(2).max(80),
     owner_phone: phone,
     slot_minutes: z.number().int().min(10).max(180),
     booking_window_days: z.number().int().min(1).max(60),

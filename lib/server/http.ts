@@ -45,7 +45,7 @@ export function errorResponse(error: unknown) {
     return NextResponse.json(
       {
         error:
-          "Ya no puedes hacer este cambio desde el enlace. Comunícate con Luisa por WhatsApp.",
+          "Ya no puedes hacer este cambio desde el enlace. Comunícate con el salón por WhatsApp.",
       },
       { status: 400 },
     );

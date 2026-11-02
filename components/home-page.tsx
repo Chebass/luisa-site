@@ -53,7 +53,7 @@ export function HomePage() {
             TU DÍA, CON CALMA
           </div>
           <h1>
-            Hola, {store.settings.owner_name}
+            Hola, {store.settings.display_name || store.settings.owner_name}
             <span className="heading-flower">✳</span>
           </h1>
           <p>Hoy es un buen día para hacer sentir bien.</p>

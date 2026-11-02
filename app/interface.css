@@ -12,7 +12,7 @@ html {
   align-items: center;
   gap: 10px;
   padding: 0 10px;
-  color: #596748;
+  color: #963a54;
 }
 .skeleton-brand > span {
   font:
@@ -76,8 +76,8 @@ html {
     left: 0;
     right: 0;
     padding: 14px 10px calc(12px + env(safe-area-inset-bottom));
-    border-top: 1px solid #e2e6d6;
-    background: #fffefa;
+    border-top: 1px solid #edcfd7;
+    background: #fffafa;
   }
   .app-skeleton-mobile-nav > div {
     display: flex;
@@ -111,7 +111,7 @@ html {
   right: 4px;
   top: 50%;
   transform: translateY(-50%);
-  color: #6c7f55;
+  color: #884c5b;
 }
 .password-field .password-toggle:active {
   transform: translateY(-50%) scale(0.97);
@@ -129,7 +129,7 @@ html {
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: #a8b193 #efefe6;
+  scrollbar-color: #bc8895 #f4e1e6;
 }
 *::-webkit-scrollbar {
   width: 10px;
@@ -140,12 +140,12 @@ html {
   border-radius: 20px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #a8b193;
-  border: 3px solid #efefe6;
+  background: #bc8895;
+  border: 3px solid #f4e1e6;
   border-radius: 20px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: #81906d;
+  background: #a25b6d;
 }
 *::-webkit-scrollbar-corner {
   background: transparent;
@@ -173,7 +173,7 @@ html {
 .modal .modal-header {
   padding: 23px 28px 20px;
   margin: 0;
-  border-bottom: 1px solid #e7eadd;
+  border-bottom: 1px solid #f0d7dd;
   gap: 18px;
   flex-shrink: 0;
 }
@@ -185,7 +185,7 @@ html {
   margin: 0;
   min-width: 48px;
   align-self: flex-start;
-  background: #f0f2e8;
+  background: #f5e5e9;
 }
 .modal-body {
   padding: 25px 28px 28px;
@@ -211,7 +211,7 @@ html {
   gap: 12px;
   width: 100%;
   min-height: 52px;
-  border: 1px solid #d8decc;
+  border: 1px solid #e1c9cf;
   border-radius: 12px;
   padding: 12px 15px;
   background: var(--white);
@@ -226,14 +226,14 @@ html {
 }
 .zen-select-trigger:hover,
 .zen-date-trigger:hover {
-  background: #f1f4e9;
-  border-color: #acb89a;
+  background: #f6e7eb;
+  border-color: #c1919d;
 }
 .zen-select-trigger:focus-visible,
 .zen-date-trigger:focus-visible,
 .zen-select-trigger[data-state="open"],
 .zen-date-trigger[data-state="open"] {
-  outline: 2px solid #7e9065;
+  outline: 2px solid #9d5869;
   outline-offset: 3px;
 }
 .zen-select-trigger > span:first-child,
@@ -245,7 +245,7 @@ html {
 }
 .zen-select-trigger > span:last-child,
 .zen-date-trigger > svg {
-  color: #7e8e69;
+  color: #9e596a;
   flex-shrink: 0;
 }
 .zen-date-trigger {
@@ -257,9 +257,9 @@ html {
   min-width: var(--radix-select-trigger-width);
   max-width: calc(100vw - 24px);
   max-height: min(340px, var(--radix-select-content-available-height));
-  border: 1px solid #dce3cf;
+  border: 1px solid #eac8d0;
   border-radius: 15px;
-  background: #fffefa;
+  background: #fffafa;
   box-shadow: 0 15px 45px #35432620;
   overflow: hidden;
   transform-origin: var(--radix-select-content-transform-origin);
@@ -285,19 +285,19 @@ html {
   line-height: 1.45;
   outline: none;
   cursor: pointer;
-  color: #535f47;
+  color: #6a3c47;
   user-select: none;
   transition:
     background 0.13s,
     color 0.13s;
 }
 .zen-select-item[data-highlighted] {
-  background: #eef3e5;
-  color: #3f5430;
+  background: #f5e3e8;
+  color: #543039;
 }
 .zen-select-item[data-state="checked"] {
-  background: #e5ecd9;
-  color: #435934;
+  background: #efd6dc;
+  color: #5a333d;
   font-weight: 500;
 }
 .zen-select-item[data-disabled] {
@@ -309,17 +309,17 @@ html {
   align-items: center;
   justify-content: center;
   height: 28px;
-  background: #f4f6ed;
-  color: #71875b;
+  background: #f8ebee;
+  color: #915161;
 }
 .zen-date-popover {
   z-index: 110;
   width: max-content;
   max-width: calc(100vw - 24px);
   padding: 17px;
-  border: 1px solid #dce3ce;
+  border: 1px solid #e3ced3;
   border-radius: 19px;
-  background: #fffefa;
+  background: #fffafa;
   box-shadow: 0 18px 55px #38482c25;
   transform-origin: var(--radix-popover-content-transform-origin);
   outline: none;
@@ -334,31 +334,31 @@ html {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #6c8055;
+  color: #884d5c;
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 1.4px;
   padding: 2px 4px 16px;
-  border-bottom: 1px solid #e8ecdf;
+  border-bottom: 1px solid #f1dae0;
   margin-bottom: 14px;
 }
 .zen-date-popover .rdp-root {
-  --rdp-accent-color: #5b6548;
-  --rdp-accent-background-color: #e9efdd;
+  --rdp-accent-color: #b94a68;
+  --rdp-accent-background-color: #f1dbe0;
   --rdp-day-width: clamp(36px, calc((100vw - 64px) / 7), 44px);
   --rdp-day-height: 48px;
   --rdp-day_button-width: var(--rdp-day-width);
   --rdp-day_button-height: 48px;
   --rdp-day_button-border-radius: 12px;
   --rdp-day_button-border: 1px solid transparent;
-  --rdp-selected-border: 1px solid #5b6548;
+  --rdp-selected-border: 1px solid #b94a68;
   --rdp-disabled-opacity: 0.3;
   --rdp-outside-opacity: 0.35;
   --rdp-nav_button-height: 48px;
   --rdp-nav_button-width: 42px;
   --rdp-nav-height: 50px;
   font-size: 17px;
-  color: #46563a;
+  color: #5c343e;
 }
 .zen-date-popover .rdp-month_caption {
   height: 50px;
@@ -372,7 +372,7 @@ html {
 .zen-date-popover .rdp-weekday {
   font-size: 11px;
   font-weight: 500;
-  color: #7a8a66;
+  color: #9a5667;
   text-transform: uppercase;
   padding: 14px 0 9px;
 }
@@ -385,44 +385,44 @@ html {
   font-weight: 400;
 }
 .zen-date-popover .rdp-day_button:hover:not(:disabled) {
-  background: #edf2e4;
+  background: #f4e2e7;
 }
 .zen-date-popover .rdp-selected .rdp-day_button {
-  background: #5b6548;
-  color: #fffefa;
+  background: #b94a68;
+  color: #fffafa;
   font-weight: 500;
 }
 .zen-date-popover .rdp-today:not(.rdp-selected) .rdp-day_button {
-  background: #f0eddf;
-  box-shadow: inset 0 0 0 1px #d5d3b9;
+  background: #f3dce2;
+  box-shadow: inset 0 0 0 1px #d7b7bf;
 }
 .zen-date-popover .rdp-button_previous,
 .zen-date-popover .rdp-button_next {
-  color: #687e50;
+  color: #844a59;
   border-radius: 10px;
 }
 .zen-date-popover .rdp-button_previous:hover,
 .zen-date-popover .rdp-button_next:hover {
-  background: #eef2e5;
+  background: #f4e3e7;
 }
 .date-picker-footer {
-  border-top: 1px solid #e8ecdf;
+  border-top: 1px solid #f1dae0;
   padding: 12px 4px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #839271;
+  color: #a55e70;
   font-size: 12px;
   margin-top: 12px;
 }
 .date-picker-footer button {
   font-size: 14px;
   min-height: 48px;
-  background: #edf2e4;
+  background: #f4e2e7;
   border: 0;
   border-radius: 10px;
   padding: 10px 17px;
-  color: #5b7046;
+  color: #74424e;
 }
 .time-picker-field {
   display: flex;
@@ -440,10 +440,10 @@ html {
   gap: 6px;
   min-height: 54px;
   padding: 3px 9px;
-  border: 1px solid #d8decc;
+  border: 1px solid #e1c9cf;
   border-radius: 12px;
-  background: #fffefa;
-  color: #7a8d65;
+  background: #fffafa;
+  color: #9b5768;
 }
 .zen-time-picker > svg {
   margin-right: 2px;
@@ -472,7 +472,7 @@ html {
 .time-period {
   font-size: 11px;
   white-space: nowrap;
-  color: #82916f;
+  color: #a45c6e;
   padding-left: 2px;
 }
 .calendar-toolbar > .zen-select-trigger {
@@ -555,7 +555,7 @@ html {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  background: #e9ecdf;
+  background: #f1dae0;
   border-radius: 11px;
   min-height: 20px;
 }
@@ -629,8 +629,8 @@ html {
   display: flex;
   gap: 22px;
   padding: 25px 22px;
-  border: 1px solid #e2e6d6;
-  background: #fffefa;
+  border: 1px solid #edcfd7;
+  background: #fffafa;
   border-radius: 17px;
   margin-bottom: 13px;
 }
@@ -681,14 +681,14 @@ html {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1px;
-  border: 1px solid #e2e6d6;
+  border: 1px solid #edcfd7;
   border-radius: 18px;
   overflow: hidden;
-  background: #dfe5d3;
+  background: #ecccd4;
   margin-bottom: 35px;
 }
 .sk-calendar-grid > div {
-  background: #fffefa;
+  background: #fffafa;
   min-height: 350px;
   padding: 16px 9px;
 }
@@ -713,8 +713,8 @@ html {
 }
 .sk-client {
   padding: 25px;
-  border: 1px solid #e2e6d6;
-  background: #fffefa;
+  border: 1px solid #edcfd7;
+  background: #fffafa;
   border-radius: 19px;
 }
 .sk-avatar {
@@ -738,9 +738,9 @@ html {
   gap: 25px;
 }
 .sk-form-panel {
-  background: #fffefa;
+  background: #fffafa;
   padding: 28px;
-  border: 1px solid #e2e6d6;
+  border: 1px solid #edcfd7;
   border-radius: 20px;
 }
 .sk-icon {
@@ -775,8 +775,8 @@ html {
 .sk-notice {
   display: flex;
   gap: 20px;
-  border: 1px solid #e2e6d6;
-  background: #fffefa;
+  border: 1px solid #edcfd7;
+  background: #fffafa;
   padding: 22px 25px;
   border-radius: 18px;
   margin-bottom: 12px;
