@@ -15,6 +15,7 @@ export async function loadSettings(): Promise<Settings> {
     visible_end: data.visible_end.slice(0, 5),
   };
 }
+const NOTICE_LIMIT = 50;
 export async function loadStore(): Promise<Store> {
   const db = serviceSupabase();
   const tables = [
@@ -22,9 +23,7 @@ export async function loadStore(): Promise<Store> {
     "appointments",
     "fixed_rules",
     "blocks",
-    "notifications",
     "message_templates",
-    "appointment_events",
   ] as const;
   async function readAll(t: (typeof tables)[number]) {
     const order =
@@ -51,8 +50,19 @@ export async function loadStore(): Promise<Store> {
     }
     return { data };
   }
-  const [settings, ...rows] = await Promise.all([
+  // Only the latest notices are shipped; appointment events load on demand.
+  async function recentNotices() {
+    const { data, error } = await db
+      .from("notifications")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(NOTICE_LIMIT);
+    if (error) throw error;
+    return { data: data ?? [] };
+  }
+  const [settings, notices, ...rows] = await Promise.all([
     loadSettings(),
+    recentNotices(),
     ...tables.map(readAll),
   ]);
   return {
@@ -61,11 +71,11 @@ export async function loadStore(): Promise<Store> {
     appointments: rows[1].data ?? [],
     fixedRules: rows[2].data ?? [],
     blocks: rows[3].data ?? [],
-    notifications: rows[4].data ?? [],
+    notifications: notices.data,
     templates: {
       ...defaultTemplates,
-      ...Object.fromEntries((rows[5].data ?? []).map((t) => [t.key, t.body])),
+      ...Object.fromEntries((rows[4].data ?? []).map((t) => [t.key, t.body])),
     },
-    events: rows[6].data ?? [],
+    events: [],
   };
 }

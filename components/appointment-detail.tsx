@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   CalendarDays,
@@ -14,7 +14,7 @@ import { Button } from "./ui/button";
 import { AppointmentForm } from "./appointment-form";
 import { useStore } from "./store-provider";
 import { dayLabel, timeLabel } from "@/lib/dates";
-import { statusLabels } from "@/lib/types";
+import { statusLabels, type AppointmentEvent } from "@/lib/types";
 import { appointmentMessage, whatsappLink } from "@/lib/whatsapp";
 const eventLabels: Record<string, string> = {
   created: "Cita agendada",
@@ -41,6 +41,18 @@ export function AppointmentDetail({
   const [error, setError] = useState("");
   const [editNote, setEditNote] = useState(false);
   const [note, setNote] = useState("");
+  const [remoteEvents, setRemoteEvents] = useState<AppointmentEvent[]>([]);
+  useEffect(() => {
+    if (demo || !navigator.onLine) return;
+    let active = true;
+    fetch(`/api/admin/events?appointment=${id}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows) => active && setRemoteEvents(rows))
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [id, demo, store.appointments]);
   const a = store.appointments.find((a) => a.id === id);
   const c = store.clients.find((c) => c.id === a?.client_id);
   if (!a || !c) return null;
@@ -285,7 +297,7 @@ export function AppointmentDetail({
           )}
           <div className="event-list">
             <h3>Historia de esta cita</h3>
-            {store.events
+            {(demo ? store.events : remoteEvents)
               .filter((e) => e.appointment_id === id)
               .sort((x, y) => y.created_at.localeCompare(x.created_at))
               .map((e) => (

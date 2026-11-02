@@ -108,13 +108,20 @@ export function StoreProvider({
     if (demo) return;
     const db = browserSupabase();
     let active = true;
-    const refresh = async () => {
+    let inFlight = false;
+    let lastRun = 0;
+    const refresh = async (force = false) => {
       if (document.visibilityState !== "visible" || !navigator.onLine) return;
+      if (inFlight || (!force && Date.now() - lastRun < 10000)) return;
+      inFlight = true;
+      lastRun = Date.now();
       try {
         const r = await fetch("/api/admin", { cache: "no-store" });
         if (r.ok && active) setStore(await r.json());
       } catch {
         /* Keep the latest agenda visible. */
+      } finally {
+        inFlight = false;
       }
     };
     const channel = db
@@ -124,18 +131,17 @@ export function StoreProvider({
         { event: "INSERT", schema: "public", table: "notifications" },
         () => {
           toast("Hay novedades en tu agenda.");
-          void refresh();
+          void refresh(true);
         },
       )
       .subscribe();
-    const timer = setInterval(refresh, 45000);
-    document.addEventListener("visibilitychange", refresh);
-    window.addEventListener("focus", refresh);
+    const timer = setInterval(() => void refresh(), 150000);
+    const onVisible = () => void refresh();
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       active = false;
       clearInterval(timer);
-      document.removeEventListener("visibilitychange", refresh);
-      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", onVisible);
       void db.removeChannel(channel);
     };
   }, [demo, toast]);
